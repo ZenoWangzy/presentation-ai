@@ -1,0 +1,2548 @@
+From 8878f26f3649d3b95e5e4e7132bb7e00508dc8a6 Mon Sep 17 00:00:00 2001
+From: ZenoWang <1016252737@qq.com>
+Date: Tue, 18 Nov 2025 01:46:08 +0800
+Subject: [PATCH] =?UTF-8?q?docs:=20=E6=B7=BB=E5=8A=A0=E5=AE=8C=E6=95=B4?=
+ =?UTF-8?q?=E7=9A=84=E9=A1=B9=E7=9B=AE=E6=96=87=E6=A1=A3=E5=92=8CAI?=
+ =?UTF-8?q?=E5=B7=A5=E5=85=B7=E9=85=8D=E7=BD=AE?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- 新增详细的CLAUDE.md项目架构文档
+- 为各核心模块添加独立的文档文件
+- 配置Claude Code、Serena和Spec Workflow工具
+- 添加项目架构记忆文件
+- 完善开发指引和API文档
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+---
+ .claude/index.json                            | 303 ++++++++++++
+ .serena/.gitignore                            |   1 +
+ .serena/memories/project_architecture.md      | 184 +++++++
+ .serena/project.yml                           |  84 ++++
+ .spec-workflow/templates/design-template.md   |  96 ++++
+ .spec-workflow/templates/product-template.md  |  51 ++
+ .../templates/requirements-template.md        |  50 ++
+ .../templates/structure-template.md           | 145 ++++++
+ .spec-workflow/templates/tasks-template.md    | 139 ++++++
+ .spec-workflow/templates/tech-template.md     |  99 ++++
+ .spec-workflow/user-templates/README.md       |  64 +++
+ CLAUDE.md                                     | 273 +++++++++++
+ prisma/CLAUDE.md                              | 449 ++++++++++++++++++
+ src/app/CLAUDE.md                             | 206 ++++++++
+ src/components/CLAUDE.md                      | 253 ++++++++++
+ 15 files changed, 2397 insertions(+)
+ create mode 100644 .claude/index.json
+ create mode 100644 .serena/.gitignore
+ create mode 100644 .serena/memories/project_architecture.md
+ create mode 100644 .serena/project.yml
+ create mode 100644 .spec-workflow/templates/design-template.md
+ create mode 100644 .spec-workflow/templates/product-template.md
+ create mode 100644 .spec-workflow/templates/requirements-template.md
+ create mode 100644 .spec-workflow/templates/structure-template.md
+ create mode 100644 .spec-workflow/templates/tasks-template.md
+ create mode 100644 .spec-workflow/templates/tech-template.md
+ create mode 100644 .spec-workflow/user-templates/README.md
+ create mode 100644 CLAUDE.md
+ create mode 100644 prisma/CLAUDE.md
+ create mode 100644 src/app/CLAUDE.md
+ create mode 100644 src/components/CLAUDE.md
+
+diff --git a/.claude/index.json b/.claude/index.json
+new file mode 100644
+index 0000000..d8669bc
+--- /dev/null
++++ b/.claude/index.json
+@@ -0,0 +1,303 @@
++{
++  "timestamp": "2025-11-17T23:56:24+08:00",
++  "projectName": "presentation-ai",
++  "projectType": "Next.js Full-Stack Application",
++  "language": "TypeScript",
++  "framework": "Next.js 15.5.4",
++  "database": "PostgreSQL with Prisma ORM",
++  "scanSummary": {
++    "totalFilesScanned": 280,
++    "estimatedTotalFiles": 320,
++    "coveragePercentage": 87,
++    "truncated": false,
++    "scanPhase": "B (Module Priority Scan)",
++    "duration": "moderate"
++  },
++  "fileStatistics": {
++    "typeScript": 63,
++    "typeScriptReact": 195,
++    "javascript": 4,
++    "javascriptReact": 0,
++    "prisma": 1,
++    "config": 8,
++    "other": 9
++  },
++  "modules": [
++    {
++      "path": "src/app",
++      "type": "Next.js App Router",
++      "description": "主要的应用路由和API端点",
++      "entryPoints": [
++        "src/app/layout.tsx",
++        "src/app/page.tsx"
++      ],
++      "apiRoutes": [
++        "src/app/api/auth/[...nextauth]/route.ts",
++        "src/app/api/presentation/generate/route.ts",
++        "src/app/api/presentation/outline/route.ts",
++        "src/app/api/presentation/outline-with-search/route.ts",
++        "src/app/api/uploadthing/route.ts"
++      ],
++      "pages": [
++        "src/app/auth/signin/page.tsx",
++        "src/app/auth/signout/page.tsx",
++        "src/app/presentation/page.tsx",
++        "src/app/presentation/[id]/page.tsx",
++        "src/app/presentation/generate/[id]/page.tsx"
++      ],
++      "serverActions": [
++        "src/app/_actions/presentation/presentationActions.ts",
++        "src/app/_actions/presentation/theme-actions.ts",
++        "src/app/_actions/presentation/fetchPresentations.ts",
++        "src/app/_actions/image/generate.ts",
++        "src/app/_actions/image/unsplash.ts"
++      ],
++      "keyFeatures": ["NextAuth.js认证", "演示文稿生成API", "文件上传", "Server Actions"],
++      "coverage": "high",
++      "docCreated": true
++    },
++    {
++      "path": "src/components/presentation",
++      "type": "React组件模块",
++      "description": "演示文稿相关的UI组件，包括仪表板、编辑器和自定义元素",
++      "subModules": [
++        {
++          "path": "dashboard",
++          "description": "演示文稿仪表板组件",
++          "componentCount": 15
++        },
++        {
++          "path": "editor",
++          "description": "演示文稿编辑器，包含丰富的自定义元素",
++          "componentCount": 100
++        },
++        {
++          "path": "theme",
++          "description": "主题相关组件",
++          "componentCount": 5
++        },
++        {
++          "path": "outline",
++          "description": "大纲编辑组件",
++          "componentCount": 3
++        }
++      ],
++      "customElements": 50,
++      "staticElements": 50,
++      "dndComponents": 10,
++      "keyFeatures": ["Plate编辑器集成", "拖拽功能", "自定义图表元素", "图像编辑", "丰富的布局模板"],
++      "coverage": "high",
++      "docCreated": true
++    },
++    {
++      "path": "src/components/plate",
++      "type": "Plate编辑器模块",
++      "description": "基于Plate.js的富文本编辑器配置和插件",
++      "plugins": [
++        "ai-kit", "basic-blocks-kit", "basic-marks-kit", "list-kit",
++        "table-kit", "link-kit", "media-kit", "math-kit", "markdown-kit",
++        "code-block-kit", "comment-kit", "dnd-kit", "font-kit"
++      ],
++      "hooks": [
++        "use-debounce", "use-is-touch-device", "use-upload-file",
++        "use-mounted", "usePlateEditor", "use-floating-toolbar"
++      ],
++      "uiComponents": 80,
++      "keyFeatures": ["AI插件", "Markdown支持", "数学公式", "表格", "拖拽", "富文本编辑"],
++      "coverage": "medium",
++      "docCreated": true
++    },
++    {
++      "path": "src/app/_actions",
++      "type": "Server Actions",
++      "description": "服务端操作函数",
++      "keyFiles": [
++        "presentationActions.ts",
++        "theme-actions.ts",
++        "fetchPresentations.ts",
++        "exportPresentationActions.ts",
++        "sharedPresentationActions.ts",
++        "image/generate.ts",
++        "image/unsplash.ts"
++      ],
++      "keyFeatures": ["演示文稿CRUD", "主题管理", "图像生成", "文件上传", "导出功能"],
++      "coverage": "medium"
++    },
++    {
++      "path": "src/hooks",
++      "type": "React Hooks",
++      "description": "自定义React钩子函数",
++      "keyFiles": [
++        "presentation/usePresentationSlides.tsx",
++        "presentation/useLocalModels.ts",
++        "presentation/useDebouncedSave.ts",
++        "presentation/useSlideChangeWatcher.ts",
++        "presentation/useSlideOperations.ts",
++        "presentation/useRootImageActions.ts",
++        "globals/useUploadthing.ts",
++        "use-mobile.tsx"
++      ],
++      "keyFeatures": ["演示文稿状态管理", "本地模型支持", "自动保存", "拖拽操作"],
++      "coverage": "medium"
++    },
++    {
++      "path": "src/lib",
++      "type": "工具库",
++      "description": "共享工具函数和配置",
++      "keyFiles": [
++        "model-picker.ts",
++        "presentation/themes.ts",
++        "utils.ts",
++        "thinking-extractor.ts"
++      ],
++      "keyFeatures": ["AI模型选择", "主题系统", "通用工具", "思维提取"],
++      "coverage": "low"
++    },
++    {
++      "path": "src/server",
++      "type": "服务端配置",
++      "description": "数据库和认证配置",
++      "keyFiles": [
++        "auth.ts",
++        "db.ts"
++      ],
++      "keyFeatures": ["NextAuth配置", "Prisma数据库连接"],
++      "coverage": "low"
++    },
++    {
++      "path": "src/components",
++      "type": "基础组件模块",
++      "description": "通用UI组件和认证组件",
++      "subModules": [
++        {
++          "path": "auth",
++          "description": "认证相关组件"
++        },
++        {
++          "path": "ui",
++          "description": "通用UI组件库"
++        },
++        {
++          "path": "globals",
++          "description": "全局组件"
++        }
++      ],
++      "coverage": "medium",
++      "docCreated": true
++    },
++    {
++      "path": "prisma",
++      "type": "数据库模块",
++      "description": "Prisma数据库模式和迁移",
++      "keyFiles": [
++        "schema.prisma"
++      ],
++      "models": ["User", "BaseDocument", "Presentation", "CustomTheme", "Account", "FavoriteDocument", "GeneratedImage"],
++      "keyFeatures": ["PostgreSQL数据库", "用户管理", "演示文稿存储", "自定义主题", "NextAuth集成"],
++      "coverage": "high",
++      "docCreated": true
++    }
++  ],
++  "gaps": [
++    {
++      "area": "测试",
++      "status": "missing",
++      "severity": "high",
++      "description": "项目中未发现测试文件，缺少单元测试、集成测试和E2E测试",
++      "recommendation": "添加Jest + React Testing Library + Playwright测试框架，为关键模块编写测试"
++    },
++    {
++      "area": "错误处理",
++      "status": "partial",
++      "severity": "medium",
++      "description": "API路由中有基本错误处理，但缺少React错误边界和统一错误处理机制",
++      "recommendation": "添加React Error Boundary组件，实现统一的API错误处理和用户友好的错误提示"
++    },
++    {
++      "area": "文档",
++      "status": "basic",
++      "severity": "medium",
++      "description": "有基础的README，但缺少API文档、组件文档和使用示例",
++      "recommendation": "为API端点添加OpenAPI/Swagger文档，为核心组件添加Storybook文档"
++    },
++    {
++      "area": "性能监控",
++      "status": "missing",
++      "severity": "medium",
++      "description": "缺少性能监控和分析工具",
++      "recommendation": "集成Web Vitals，添加性能分析工具，监控Bundle大小和加载时间"
++    },
++    {
++      "area": "国际化",
++      "status": "missing",
++      "severity": "low",
++      "description": "项目支持多语言演示文稿生成，但界面本身未国际化",
++      "recommendation": "集成next-intl或react-i18next，实现界面国际化"
++    }
++  ],
++  "ignoredFiles": {
++    "node_modules": "依赖包目录",
++    ".next": "Next.js构建输出",
++    ".git": "Git版本控制",
++    "pnpm-lock.yaml": "包管理器锁定文件",
++    "*.log": "日志文件",
++    "dist": "构建输出目录",
++    "build": "构建输出目录"
++  },
++  "nextSteps": [
++    "深度扫描src/lib目录，了解完整工具函数库实现",
++    "分析src/components/presentation/editor/custom-elements中的所有自定义元素类型和用法",
++    "检查API路由的完整实现，特别是错误处理和安全性",
++    "分析状态管理策略，了解Zustand的使用情况",
++    "检查主题系统的完整实现和数据结构",
++    "分析演示文稿导出功能(PPTX)的实现情况",
++    "审查AI模型选择和集成的实现细节",
++    "检查拖拽功能的完整实现和用户体验"
++  ],
++  "techStack": {
++    "frontend": ["Next.js 15.5.4", "React 19.1.0", "TypeScript", "Tailwind CSS", "Radix UI"],
++    "backend": ["Next.js API Routes", "Prisma ORM", "PostgreSQL", "NextAuth.js"],
++    "editor": ["Plate.js", "ProseMirror", "Slate"],
++    "ai": ["OpenAI API", "Together AI", "Ollama", "LM Studio", "Tavily API"],
++    "ui": ["Radix UI", "Lucide React", "Framer Motion", "DND Kit"],
++    "tools": ["Biome", "ESLint", "TypeScript", "PNPM"],
++    "charts": ["Recharts", "自定义图表组件"]
++  },
++  "dependencies": {
++    "total": 162,
++    "categories": {
++      "ai": 8,
++      "ui": 25,
++      "editor": 20,
++      "database": 2,
++      "auth": 2,
++      "styling": 5,
++      "utilities": 15,
++      "react": 10,
++      "next": 3,
++      "charts": 3,
++      "dnd": 3,
++      "files": 2
++    }
++  },
++  "documentationCreated": [
++    "CLAUDE.md (根级别)",
++    "src/app/CLAUDE.md",
++    "src/components/CLAUDE.md",
++    "prisma/CLAUDE.md"
++  ],
++  "codeQuality": {
++    "typeScript": true,
++    "strictMode": true,
++    "eslint": true,
++    "prettier": true,
++    "biome": true
++  },
++  "architecture": {
++    "pattern": "Full-stack Next.js with App Router",
++    "stateManagement": "React Context + Zustand",
++    "styling": "Tailwind CSS + Radix UI",
++    "database": "PostgreSQL + Prisma ORM",
++    "authentication": "NextAuth.js"
++  }
++}
+\ No newline at end of file
+diff --git a/.serena/.gitignore b/.serena/.gitignore
+new file mode 100644
+index 0000000..14d86ad
+--- /dev/null
++++ b/.serena/.gitignore
+@@ -0,0 +1 @@
++/cache
+diff --git a/.serena/memories/project_architecture.md b/.serena/memories/project_architecture.md
+new file mode 100644
+index 0000000..9349a2d
+--- /dev/null
++++ b/.serena/memories/project_architecture.md
+@@ -0,0 +1,184 @@
++# Presentation AI - 项目架构记忆
++
++## 项目概述
++Presentation AI 是一个基于AI的演示文稿生成平台，使用Next.js 15 + React 19 + TypeScript构建。灵感来源于Gamma.app，支持AI驱动的内容生成、实时编辑和多主题定制。
++
++## 核心技术栈
++
++### 前端框架
++- **Next.js**: 15.5.4 (App Router)
++- **React**: 19.1.0
++- **TypeScript**: 5.9.2
++- **Tailwind CSS**: 3.4.17
++
++### 数据库与ORM
++- **PostgreSQL**: 主数据库
++- **Prisma**: 6.13.0 ORM
++
++### 认证与授权
++- **NextAuth.js**: 5.0.0-beta.29 (Google OAuth)
++
++### AI集成
++- **OpenAI API**: GPT系列模型，文本生成
++- **Together AI**: 图像生成
++- **本地模型**: Ollama + LM Studio支持
++
++### 编辑器组件
++- **Plate.js**: 49.2.21 (基于Slate/ProseMirror的富文本编辑器)
++- **DND Kit**: 拖拽功能
++- **Radix UI**: 无障碍UI组件
++
++### 文件处理
++- **UploadThing**: 文件上传服务
++
++## 核心模块架构
++
++### 1. App模块 (src/app/)
++Next.js App Router核心，包含：
++- 应用路由和页面定义
++- API端点实现
++- Server Actions
++- 全局布局配置
++
++**关键API端点**:
++- `/api/presentation/generate` - 演示文稿生成
++- `/api/presentation/outline` - 大纲生成
++- `/api/auth/[...nextauth]` - 认证处理
++
++### 2. 组件模块 (src/components/)
++- **presentation/**: 演示文稿相关UI组件
++  - dashboard/: 仪表板组件
++  - editor/: 编辑器组件
++  - theme/: 主题组件
++  - outline/: 大纲组件
++- **plate/**: Plate编辑器配置和插件
++- **ui/**: 通用UI组件
++
++### 3. 数据模型 (Prisma)
++
++**核心实体**:
++- **User**: 用户管理，支持角色权限
++- **BaseDocument**: 文档基类，支持多种文档类型
++- **Presentation**: 演示文稿特化模型
++- **CustomTheme**: 自定义主题系统
++- **GeneratedImage**: AI生成图像管理
++
++**关系结构**:
++```
++User 1:N BaseDocument 1:1 Presentation
++User 1:N CustomTheme 1:N Presentation
++User 1:N GeneratedImage
++```
++
++### 4. 服务端操作 (src/app/_actions/)
++Server Actions处理服务端业务逻辑：
++- 演示文稿CRUD操作
++- 主题管理
++- 图像生成
++- 导出功能
++
++## 核心数据流
++
++### 演示文稿生成流程
++```mermaid
++sequenceDiagram
++    participant U as 用户
++    participant D as Dashboard
++    participant API as API Routes
++    participant AI as AI Service
++    participant DB as Database
++
++    U->>D: 输入主题和参数
++    D->>API: 请求生成大纲
++    API->>AI: 调用AI模型
++    AI-->>API: 返回大纲
++    API-->>D: 显示大纲供编辑
++    
++    U->>D: 确认生成
++    D->>API: 请求生成演示文稿
++    API->>AI: 流式生成幻灯片
++    AI-->>API: 返回内容
++    API->>DB: 保存演示文稿
++    API-->>D: 返回结果
++```
++
++### AI模型支持
++- **OpenAI**: GPT-4等文本模型
++- **Together AI**: 图像生成模型
++- **本地模型**: 通过Ollama/LM Studio
++
++## 开发脚本
++
++```bash
++# 开发相关
++pnpm dev          # 启动开发服务器 (Turbo)
++pnpm build        # 构建生产版本 (Turbo)
++pnpm start        # 启动生产服务器
++pnpm type         # TypeScript类型检查
++pnpm lint         # 代码检查
++pnpm lint:fix     # 自动修复代码问题
++pnpm check        # 完整代码检查
++pnpm check:fix    # 自动修复所有问题
++
++# 数据库相关
++pnpm db:push      # 推送schema更改
++pnpm db:studio    # 打开Prisma Studio
++
++# 依赖管理
++pnpm install      # 安装依赖
++pnpm postinstall  # 生成Prisma客户端
++```
++
++## 环境变量配置
++
++必需的环境变量：
++```env
++# AI服务
++OPENAI_API_KEY=""
++TOGETHER_AI_API_KEY=""
++
++# NextAuth
++NEXTAUTH_SECRET=""
++NEXTAUTH_URL="http://localhost:3000"
++GOOGLE_CLIENT_ID=""
++GOOGLE_CLIENT_SECRET=""
++
++# 文件服务
++UPLOADTHING_TOKEN=""
++UNSLPASH_ACCESS_KEY=""
++
++# 数据库
++DATABASE_URL="postgresql://..."
++```
++
++## 测试状态
++**当前状态**: 项目缺少测试覆盖
++
++**建议测试框架**:
++- Jest + React Testing Library (单元测试)
++- Playwright (E2E测试)
++- Supertest (API测试)
++
++## 已知问题和改进点
++
++1. **测试覆盖**: 需要完整的测试套件
++2. **移动端适配**: 需要改进移动端体验  
++3. **性能优化**: 可添加缓存和查询优化
++4. **错误处理**: 需要更完善的错误边界
++5. **文档完善**: API文档和组件文档需要补充
++
++## 扩展功能路线图
++- [ ] 导出PDF功能
++- [ ] 实时协作
++- [ ] 模板库
++- [ ] 动画和过渡效果
++- [ ] 多语言支持
++- [ ] 插件系统
++
++## 开发注意事项
++
++1. **代码规范**: 使用Biome进行代码格式化和检查
++2. **类型安全**: TypeScript严格模式
++3. **安全性**: API密钥不提交到版本控制
++4. **性能**: 使用流式响应处理AI生成内容
++5. **可维护性**: 遵循现有目录结构和命名约定
+\ No newline at end of file
+diff --git a/.serena/project.yml b/.serena/project.yml
+new file mode 100644
+index 0000000..daaca01
+--- /dev/null
++++ b/.serena/project.yml
+@@ -0,0 +1,84 @@
++# list of languages for which language servers are started; choose from:
++#   al               bash             clojure          cpp              csharp           csharp_omnisharp
++#   dart             elixir           elm              erlang           fortran          go
++#   haskell          java             julia            kotlin           lua              markdown
++#   nix              perl             php              python           python_jedi      r
++#   rego             ruby             ruby_solargraph  rust             scala            swift
++#   terraform        typescript       typescript_vts   zig
++# Note:
++#   - For C, use cpp
++#   - For JavaScript, use typescript
++# Special requirements:
++#   - csharp: Requires the presence of a .sln file in the project folder.
++# When using multiple languages, the first language server that supports a given file will be used for that file.
++# The first language is the default language and the respective language server will be used as a fallback.
++# Note that when using the JetBrains backend, language servers are not used and this list is correspondingly ignored.
++languages:
++- typescript
++
++# the encoding used by text files in the project
++# For a list of possible encodings, see https://docs.python.org/3.11/library/codecs.html#standard-encodings
++encoding: "utf-8"
++
++# whether to use the project's gitignore file to ignore files
++# Added on 2025-04-07
++ignore_all_files_in_gitignore: true
++
++# list of additional paths to ignore
++# same syntax as gitignore, so you can use * and **
++# Was previously called `ignored_dirs`, please update your config if you are using that.
++# Added (renamed) on 2025-04-07
++ignored_paths: []
++
++# whether the project is in read-only mode
++# If set to true, all editing tools will be disabled and attempts to use them will result in an error
++# Added on 2025-04-18
++read_only: false
++
++# list of tool names to exclude. We recommend not excluding any tools, see the readme for more details.
++# Below is the complete list of tools for convenience.
++# To make sure you have the latest list of tools, and to view their descriptions, 
++# execute `uv run scripts/print_tool_overview.py`.
++#
++#  * `activate_project`: Activates a project by name.
++#  * `check_onboarding_performed`: Checks whether project onboarding was already performed.
++#  * `create_text_file`: Creates/overwrites a file in the project directory.
++#  * `delete_lines`: Deletes a range of lines within a file.
++#  * `delete_memory`: Deletes a memory from Serena's project-specific memory store.
++#  * `execute_shell_command`: Executes a shell command.
++#  * `find_referencing_code_snippets`: Finds code snippets in which the symbol at the given location is referenced.
++#  * `find_referencing_symbols`: Finds symbols that reference the symbol at the given location (optionally filtered by type).
++#  * `find_symbol`: Performs a global (or local) search for symbols with/containing a given name/substring (optionally filtered by type).
++#  * `get_current_config`: Prints the current configuration of the agent, including the active and available projects, tools, contexts, and modes.
++#  * `get_symbols_overview`: Gets an overview of the top-level symbols defined in a given file.
++#  * `initial_instructions`: Gets the initial instructions for the current project.
++#     Should only be used in settings where the system prompt cannot be set,
++#     e.g. in clients you have no control over, like Claude Desktop.
++#  * `insert_after_symbol`: Inserts content after the end of the definition of a given symbol.
++#  * `insert_at_line`: Inserts content at a given line in a file.
++#  * `insert_before_symbol`: Inserts content before the beginning of the definition of a given symbol.
++#  * `list_dir`: Lists files and directories in the given directory (optionally with recursion).
++#  * `list_memories`: Lists memories in Serena's project-specific memory store.
++#  * `onboarding`: Performs onboarding (identifying the project structure and essential tasks, e.g. for testing or building).
++#  * `prepare_for_new_conversation`: Provides instructions for preparing for a new conversation (in order to continue with the necessary context).
++#  * `read_file`: Reads a file within the project directory.
++#  * `read_memory`: Reads the memory with the given name from Serena's project-specific memory store.
++#  * `remove_project`: Removes a project from the Serena configuration.
++#  * `replace_lines`: Replaces a range of lines within a file with new content.
++#  * `replace_symbol_body`: Replaces the full definition of a symbol.
++#  * `restart_language_server`: Restarts the language server, may be necessary when edits not through Serena happen.
++#  * `search_for_pattern`: Performs a search for a pattern in the project.
++#  * `summarize_changes`: Provides instructions for summarizing the changes made to the codebase.
++#  * `switch_modes`: Activates modes by providing a list of their names
++#  * `think_about_collected_information`: Thinking tool for pondering the completeness of collected information.
++#  * `think_about_task_adherence`: Thinking tool for determining whether the agent is still on track with the current task.
++#  * `think_about_whether_you_are_done`: Thinking tool for determining whether the task is truly completed.
++#  * `write_memory`: Writes a named memory (for future reference) to Serena's project-specific memory store.
++excluded_tools: []
++
++# initial prompt for the project. It will always be given to the LLM upon activating the project
++# (contrary to the memories, which are loaded on demand).
++initial_prompt: ""
++
++project_name: "presentation-ai"
++included_optional_tools: []
+diff --git a/.spec-workflow/templates/design-template.md b/.spec-workflow/templates/design-template.md
+new file mode 100644
+index 0000000..1295d7b
+--- /dev/null
++++ b/.spec-workflow/templates/design-template.md
+@@ -0,0 +1,96 @@
++# Design Document
++
++## Overview
++
++[High-level description of the feature and its place in the overall system]
++
++## Steering Document Alignment
++
++### Technical Standards (tech.md)
++[How the design follows documented technical patterns and standards]
++
++### Project Structure (structure.md)
++[How the implementation will follow project organization conventions]
++
++## Code Reuse Analysis
++[What existing code will be leveraged, extended, or integrated with this feature]
++
++### Existing Components to Leverage
++- **[Component/Utility Name]**: [How it will be used]
++- **[Service/Helper Name]**: [How it will be extended]
++
++### Integration Points
++- **[Existing System/API]**: [How the new feature will integrate]
++- **[Database/Storage]**: [How data will connect to existing schemas]
++
++## Architecture
++
++[Describe the overall architecture and design patterns used]
++
++### Modular Design Principles
++- **Single File Responsibility**: Each file should handle one specific concern or domain
++- **Component Isolation**: Create small, focused components rather than large monolithic files
++- **Service Layer Separation**: Separate data access, business logic, and presentation layers
++- **Utility Modularity**: Break utilities into focused, single-purpose modules
++
++```mermaid
++graph TD
++    A[Component A] --> B[Component B]
++    B --> C[Component C]
++```
++
++## Components and Interfaces
++
++### Component 1
++- **Purpose:** [What this component does]
++- **Interfaces:** [Public methods/APIs]
++- **Dependencies:** [What it depends on]
++- **Reuses:** [Existing components/utilities it builds upon]
++
++### Component 2
++- **Purpose:** [What this component does]
++- **Interfaces:** [Public methods/APIs]
++- **Dependencies:** [What it depends on]
++- **Reuses:** [Existing components/utilities it builds upon]
++
++## Data Models
++
++### Model 1
++```
++[Define the structure of Model1 in your language]
++- id: [unique identifier type]
++- name: [string/text type]
++- [Additional properties as needed]
++```
++
++### Model 2
++```
++[Define the structure of Model2 in your language]
++- id: [unique identifier type]
++- [Additional properties as needed]
++```
++
++## Error Handling
++
++### Error Scenarios
++1. **Scenario 1:** [Description]
++   - **Handling:** [How to handle]
++   - **User Impact:** [What user sees]
++
++2. **Scenario 2:** [Description]
++   - **Handling:** [How to handle]
++   - **User Impact:** [What user sees]
++
++## Testing Strategy
++
++### Unit Testing
++- [Unit testing approach]
++- [Key components to test]
++
++### Integration Testing
++- [Integration testing approach]
++- [Key flows to test]
++
++### End-to-End Testing
++- [E2E testing approach]
++- [User scenarios to test]
+diff --git a/.spec-workflow/templates/product-template.md b/.spec-workflow/templates/product-template.md
+new file mode 100644
+index 0000000..82e60de
+--- /dev/null
++++ b/.spec-workflow/templates/product-template.md
+@@ -0,0 +1,51 @@
++# Product Overview
++
++## Product Purpose
++[Describe the core purpose of this product/project. What problem does it solve?]
++
++## Target Users
++[Who are the primary users of this product? What are their needs and pain points?]
++
++## Key Features
++[List the main features that deliver value to users]
++
++1. **Feature 1**: [Description]
++2. **Feature 2**: [Description]
++3. **Feature 3**: [Description]
++
++## Business Objectives
++[What are the business goals this product aims to achieve?]
++
++- [Objective 1]
++- [Objective 2]
++- [Objective 3]
++
++## Success Metrics
++[How will we measure the success of this product?]
++
++- [Metric 1]: [Target]
++- [Metric 2]: [Target]
++- [Metric 3]: [Target]
++
++## Product Principles
++[Core principles that guide product decisions]
++
++1. **[Principle 1]**: [Explanation]
++2. **[Principle 2]**: [Explanation]
++3. **[Principle 3]**: [Explanation]
++
++## Monitoring & Visibility (if applicable)
++[How do users track progress and monitor the system?]
++
++- **Dashboard Type**: [e.g., Web-based, CLI, Desktop app]
++- **Real-time Updates**: [e.g., WebSocket, polling, push notifications]
++- **Key Metrics Displayed**: [What information is most important to surface]
++- **Sharing Capabilities**: [e.g., read-only links, exports, reports]
++
++## Future Vision
++[Where do we see this product evolving in the future?]
++
++### Potential Enhancements
++- **Remote Access**: [e.g., Tunnel features for sharing dashboards with stakeholders]
++- **Analytics**: [e.g., Historical trends, performance metrics]
++- **Collaboration**: [e.g., Multi-user support, commenting]
+diff --git a/.spec-workflow/templates/requirements-template.md b/.spec-workflow/templates/requirements-template.md
+new file mode 100644
+index 0000000..1c80ca0
+--- /dev/null
++++ b/.spec-workflow/templates/requirements-template.md
+@@ -0,0 +1,50 @@
++# Requirements Document
++
++## Introduction
++
++[Provide a brief overview of the feature, its purpose, and its value to users]
++
++## Alignment with Product Vision
++
++[Explain how this feature supports the goals outlined in product.md]
++
++## Requirements
++
++### Requirement 1
++
++**User Story:** As a [role], I want [feature], so that [benefit]
++
++#### Acceptance Criteria
++
++1. WHEN [event] THEN [system] SHALL [response]
++2. IF [precondition] THEN [system] SHALL [response]
++3. WHEN [event] AND [condition] THEN [system] SHALL [response]
++
++### Requirement 2
++
++**User Story:** As a [role], I want [feature], so that [benefit]
++
++#### Acceptance Criteria
++
++1. WHEN [event] THEN [system] SHALL [response]
++2. IF [precondition] THEN [system] SHALL [response]
++
++## Non-Functional Requirements
++
++### Code Architecture and Modularity
++- **Single Responsibility Principle**: Each file should have a single, well-defined purpose
++- **Modular Design**: Components, utilities, and services should be isolated and reusable
++- **Dependency Management**: Minimize interdependencies between modules
++- **Clear Interfaces**: Define clean contracts between components and layers
++
++### Performance
++- [Performance requirements]
++
++### Security
++- [Security requirements]
++
++### Reliability
++- [Reliability requirements]
++
++### Usability
++- [Usability requirements]
+diff --git a/.spec-workflow/templates/structure-template.md b/.spec-workflow/templates/structure-template.md
+new file mode 100644
+index 0000000..1ab1fbc
+--- /dev/null
++++ b/.spec-workflow/templates/structure-template.md
+@@ -0,0 +1,145 @@
++# Project Structure
++
++## Directory Organization
++
++```
++[Define your project's directory structure. Examples below - adapt to your project type]
++
++Example for a library/package:
++project-root/
++├── src/                    # Source code
++├── tests/                  # Test files  
++├── docs/                   # Documentation
++├── examples/               # Usage examples
++└── [build/dist/out]        # Build output
++
++Example for an application:
++project-root/
++├── [src/app/lib]           # Main source code
++├── [assets/resources]      # Static resources
++├── [config/settings]       # Configuration
++├── [scripts/tools]         # Build/utility scripts
++└── [tests/spec]            # Test files
++
++Common patterns:
++- Group by feature/module
++- Group by layer (UI, business logic, data)
++- Group by type (models, controllers, views)
++- Flat structure for simple projects
++```
++
++## Naming Conventions
++
++### Files
++- **Components/Modules**: [e.g., `PascalCase`, `snake_case`, `kebab-case`]
++- **Services/Handlers**: [e.g., `UserService`, `user_service`, `user-service`]
++- **Utilities/Helpers**: [e.g., `dateUtils`, `date_utils`, `date-utils`]
++- **Tests**: [e.g., `[filename]_test`, `[filename].test`, `[filename]Test`]
++
++### Code
++- **Classes/Types**: [e.g., `PascalCase`, `CamelCase`, `snake_case`]
++- **Functions/Methods**: [e.g., `camelCase`, `snake_case`, `PascalCase`]
++- **Constants**: [e.g., `UPPER_SNAKE_CASE`, `SCREAMING_CASE`, `PascalCase`]
++- **Variables**: [e.g., `camelCase`, `snake_case`, `lowercase`]
++
++## Import Patterns
++
++### Import Order
++1. External dependencies
++2. Internal modules
++3. Relative imports
++4. Style imports
++
++### Module/Package Organization
++```
++[Describe your project's import/include patterns]
++Examples:
++- Absolute imports from project root
++- Relative imports within modules
++- Package/namespace organization
++- Dependency management approach
++```
++
++## Code Structure Patterns
++
++[Define common patterns for organizing code within files. Below are examples - choose what applies to your project]
++
++### Module/Class Organization
++```
++Example patterns:
++1. Imports/includes/dependencies
++2. Constants and configuration
++3. Type/interface definitions
++4. Main implementation
++5. Helper/utility functions
++6. Exports/public API
++```
++
++### Function/Method Organization
++```
++Example patterns:
++- Input validation first
++- Core logic in the middle
++- Error handling throughout
++- Clear return points
++```
++
++### File Organization Principles
++```
++Choose what works for your project:
++- One class/module per file
++- Related functionality grouped together
++- Public API at the top/bottom
++- Implementation details hidden
++```
++
++## Code Organization Principles
++
++1. **Single Responsibility**: Each file should have one clear purpose
++2. **Modularity**: Code should be organized into reusable modules
++3. **Testability**: Structure code to be easily testable
++4. **Consistency**: Follow patterns established in the codebase
++
++## Module Boundaries
++[Define how different parts of your project interact and maintain separation of concerns]
++
++Examples of boundary patterns:
++- **Core vs Plugins**: Core functionality vs extensible plugins
++- **Public API vs Internal**: What's exposed vs implementation details  
++- **Platform-specific vs Cross-platform**: OS-specific code isolation
++- **Stable vs Experimental**: Production code vs experimental features
++- **Dependencies direction**: Which modules can depend on which
++
++## Code Size Guidelines
++[Define your project's guidelines for file and function sizes]
++
++Suggested guidelines:
++- **File size**: [Define maximum lines per file]
++- **Function/Method size**: [Define maximum lines per function]
++- **Class/Module complexity**: [Define complexity limits]
++- **Nesting depth**: [Maximum nesting levels]
++
++## Dashboard/Monitoring Structure (if applicable)
++[How dashboard or monitoring components are organized]
++
++### Example Structure:
++```
++src/
++└── dashboard/          # Self-contained dashboard subsystem
++    ├── server/        # Backend server components
++    ├── client/        # Frontend assets
++    ├── shared/        # Shared types/utilities
++    └── public/        # Static assets
++```
++
++### Separation of Concerns
++- Dashboard isolated from core business logic
++- Own CLI entry point for independent operation
++- Minimal dependencies on main application
++- Can be disabled without affecting core functionality
++
++## Documentation Standards
++- All public APIs must have documentation
++- Complex logic should include inline comments
++- README files for major modules
++- Follow language-specific documentation conventions
+diff --git a/.spec-workflow/templates/tasks-template.md b/.spec-workflow/templates/tasks-template.md
+new file mode 100644
+index 0000000..be461de
+--- /dev/null
++++ b/.spec-workflow/templates/tasks-template.md
+@@ -0,0 +1,139 @@
++# Tasks Document
++
++- [ ] 1. Create core interfaces in src/types/feature.ts
++  - File: src/types/feature.ts
++  - Define TypeScript interfaces for feature data structures
++  - Extend existing base interfaces from base.ts
++  - Purpose: Establish type safety for feature implementation
++  - _Leverage: src/types/base.ts_
++  - _Requirements: 1.1_
++  - _Prompt: Role: TypeScript Developer specializing in type systems and interfaces | Task: Create comprehensive TypeScript interfaces for the feature data structures following requirements 1.1, extending existing base interfaces from src/types/base.ts | Restrictions: Do not modify existing base interfaces, maintain backward compatibility, follow project naming conventions | Success: All interfaces compile without errors, proper inheritance from base types, full type coverage for feature requirements_
++
++- [ ] 2. Create base model class in src/models/FeatureModel.ts
++  - File: src/models/FeatureModel.ts
++  - Implement base model extending BaseModel class
++  - Add validation methods using existing validation utilities
++  - Purpose: Provide data layer foundation for feature
++  - _Leverage: src/models/BaseModel.ts, src/utils/validation.ts_
++  - _Requirements: 2.1_
++  - _Prompt: Role: Backend Developer with expertise in Node.js and data modeling | Task: Create a base model class extending BaseModel and implementing validation following requirement 2.1, leveraging existing patterns from src/models/BaseModel.ts and src/utils/validation.ts | Restrictions: Must follow existing model patterns, do not bypass validation utilities, maintain consistent error handling | Success: Model extends BaseModel correctly, validation methods implemented and tested, follows project architecture patterns_
++
++- [ ] 3. Add specific model methods to FeatureModel.ts
++  - File: src/models/FeatureModel.ts (continue from task 2)
++  - Implement create, update, delete methods
++  - Add relationship handling for foreign keys
++  - Purpose: Complete model functionality for CRUD operations
++  - _Leverage: src/models/BaseModel.ts_
++  - _Requirements: 2.2, 2.3_
++  - _Prompt: Role: Backend Developer with expertise in ORM and database operations | Task: Implement CRUD methods and relationship handling in FeatureModel.ts following requirements 2.2 and 2.3, extending patterns from src/models/BaseModel.ts | Restrictions: Must maintain transaction integrity, follow existing relationship patterns, do not duplicate base model functionality | Success: All CRUD operations work correctly, relationships are properly handled, database operations are atomic and efficient_
++
++- [ ] 4. Create model unit tests in tests/models/FeatureModel.test.ts
++  - File: tests/models/FeatureModel.test.ts
++  - Write tests for model validation and CRUD methods
++  - Use existing test utilities and fixtures
++  - Purpose: Ensure model reliability and catch regressions
++  - _Leverage: tests/helpers/testUtils.ts, tests/fixtures/data.ts_
++  - _Requirements: 2.1, 2.2_
++  - _Prompt: Role: QA Engineer with expertise in unit testing and Jest/Mocha frameworks | Task: Create comprehensive unit tests for FeatureModel validation and CRUD methods covering requirements 2.1 and 2.2, using existing test utilities from tests/helpers/testUtils.ts and fixtures from tests/fixtures/data.ts | Restrictions: Must test both success and failure scenarios, do not test external dependencies directly, maintain test isolation | Success: All model methods are tested with good coverage, edge cases covered, tests run independently and consistently_
++
++- [ ] 5. Create service interface in src/services/IFeatureService.ts
++  - File: src/services/IFeatureService.ts
++  - Define service contract with method signatures
++  - Extend base service interface patterns
++  - Purpose: Establish service layer contract for dependency injection
++  - _Leverage: src/services/IBaseService.ts_
++  - _Requirements: 3.1_
++  - _Prompt: Role: Software Architect specializing in service-oriented architecture and TypeScript interfaces | Task: Design service interface contract following requirement 3.1, extending base service patterns from src/services/IBaseService.ts for dependency injection | Restrictions: Must maintain interface segregation principle, do not expose internal implementation details, ensure contract compatibility with DI container | Success: Interface is well-defined with clear method signatures, extends base service appropriately, supports all required service operations_
++
++- [ ] 6. Implement feature service in src/services/FeatureService.ts
++  - File: src/services/FeatureService.ts
++  - Create concrete service implementation using FeatureModel
++  - Add error handling with existing error utilities
++  - Purpose: Provide business logic layer for feature operations
++  - _Leverage: src/services/BaseService.ts, src/utils/errorHandler.ts, src/models/FeatureModel.ts_
++  - _Requirements: 3.2_
++  - _Prompt: Role: Backend Developer with expertise in service layer architecture and business logic | Task: Implement concrete FeatureService following requirement 3.2, using FeatureModel and extending BaseService patterns with proper error handling from src/utils/errorHandler.ts | Restrictions: Must implement interface contract exactly, do not bypass model validation, maintain separation of concerns from data layer | Success: Service implements all interface methods correctly, robust error handling implemented, business logic is well-encapsulated and testable_
++
++- [ ] 7. Add service dependency injection in src/utils/di.ts
++  - File: src/utils/di.ts (modify existing)
++  - Register FeatureService in dependency injection container
++  - Configure service lifetime and dependencies
++  - Purpose: Enable service injection throughout application
++  - _Leverage: existing DI configuration in src/utils/di.ts_
++  - _Requirements: 3.1_
++  - _Prompt: Role: DevOps Engineer with expertise in dependency injection and IoC containers | Task: Register FeatureService in DI container following requirement 3.1, configuring appropriate lifetime and dependencies using existing patterns from src/utils/di.ts | Restrictions: Must follow existing DI container patterns, do not create circular dependencies, maintain service resolution efficiency | Success: FeatureService is properly registered and resolvable, dependencies are correctly configured, service lifetime is appropriate for use case_
++
++- [ ] 8. Create service unit tests in tests/services/FeatureService.test.ts
++  - File: tests/services/FeatureService.test.ts
++  - Write tests for service methods with mocked dependencies
++  - Test error handling scenarios
++  - Purpose: Ensure service reliability and proper error handling
++  - _Leverage: tests/helpers/testUtils.ts, tests/mocks/modelMocks.ts_
++  - _Requirements: 3.2, 3.3_
++  - _Prompt: Role: QA Engineer with expertise in service testing and mocking frameworks | Task: Create comprehensive unit tests for FeatureService methods covering requirements 3.2 and 3.3, using mocked dependencies from tests/mocks/modelMocks.ts and test utilities | Restrictions: Must mock all external dependencies, test business logic in isolation, do not test framework code | Success: All service methods tested with proper mocking, error scenarios covered, tests verify business logic correctness and error handling_
++
++- [ ] 4. Create API endpoints
++  - Design API structure
++  - _Leverage: src/api/baseApi.ts, src/utils/apiUtils.ts_
++  - _Requirements: 4.0_
++  - _Prompt: Role: API Architect specializing in RESTful design and Express.js | Task: Design comprehensive API structure following requirement 4.0, leveraging existing patterns from src/api/baseApi.ts and utilities from src/utils/apiUtils.ts | Restrictions: Must follow REST conventions, maintain API versioning compatibility, do not expose internal data structures directly | Success: API structure is well-designed and documented, follows existing patterns, supports all required operations with proper HTTP methods and status codes_
++
++- [ ] 4.1 Set up routing and middleware
++  - Configure application routes
++  - Add authentication middleware
++  - Set up error handling middleware
++  - _Leverage: src/middleware/auth.ts, src/middleware/errorHandler.ts_
++  - _Requirements: 4.1_
++  - _Prompt: Role: Backend Developer with expertise in Express.js middleware and routing | Task: Configure application routes and middleware following requirement 4.1, integrating authentication from src/middleware/auth.ts and error handling from src/middleware/errorHandler.ts | Restrictions: Must maintain middleware order, do not bypass security middleware, ensure proper error propagation | Success: Routes are properly configured with correct middleware chain, authentication works correctly, errors are handled gracefully throughout the request lifecycle_
++
++- [ ] 4.2 Implement CRUD endpoints
++  - Create API endpoints
++  - Add request validation
++  - Write API integration tests
++  - _Leverage: src/controllers/BaseController.ts, src/utils/validation.ts_
++  - _Requirements: 4.2, 4.3_
++  - _Prompt: Role: Full-stack Developer with expertise in API development and validation | Task: Implement CRUD endpoints following requirements 4.2 and 4.3, extending BaseController patterns and using validation utilities from src/utils/validation.ts | Restrictions: Must validate all inputs, follow existing controller patterns, ensure proper HTTP status codes and responses | Success: All CRUD operations work correctly, request validation prevents invalid data, integration tests pass and cover all endpoints_
++
++- [ ] 5. Add frontend components
++  - Plan component architecture
++  - _Leverage: src/components/BaseComponent.tsx, src/styles/theme.ts_
++  - _Requirements: 5.0_
++  - _Prompt: Role: Frontend Architect with expertise in React component design and architecture | Task: Plan comprehensive component architecture following requirement 5.0, leveraging base patterns from src/components/BaseComponent.tsx and theme system from src/styles/theme.ts | Restrictions: Must follow existing component patterns, maintain design system consistency, ensure component reusability | Success: Architecture is well-planned and documented, components are properly organized, follows existing patterns and theme system_
++
++- [ ] 5.1 Create base UI components
++  - Set up component structure
++  - Implement reusable components
++  - Add styling and theming
++  - _Leverage: src/components/BaseComponent.tsx, src/styles/theme.ts_
++  - _Requirements: 5.1_
++  - _Prompt: Role: Frontend Developer specializing in React and component architecture | Task: Create reusable UI components following requirement 5.1, extending BaseComponent patterns and using existing theme system from src/styles/theme.ts | Restrictions: Must use existing theme variables, follow component composition patterns, ensure accessibility compliance | Success: Components are reusable and properly themed, follow existing architecture, accessible and responsive_
++
++- [ ] 5.2 Implement feature-specific components
++  - Create feature components
++  - Add state management
++  - Connect to API endpoints
++  - _Leverage: src/hooks/useApi.ts, src/components/BaseComponent.tsx_
++  - _Requirements: 5.2, 5.3_
++  - _Prompt: Role: React Developer with expertise in state management and API integration | Task: Implement feature-specific components following requirements 5.2 and 5.3, using API hooks from src/hooks/useApi.ts and extending BaseComponent patterns | Restrictions: Must use existing state management patterns, handle loading and error states properly, maintain component performance | Success: Components are fully functional with proper state management, API integration works smoothly, user experience is responsive and intuitive_
++
++- [ ] 6. Integration and testing
++  - Plan integration approach
++  - _Leverage: src/utils/integrationUtils.ts, tests/helpers/testUtils.ts_
++  - _Requirements: 6.0_
++  - _Prompt: Role: Integration Engineer with expertise in system integration and testing strategies | Task: Plan comprehensive integration approach following requirement 6.0, leveraging integration utilities from src/utils/integrationUtils.ts and test helpers | Restrictions: Must consider all system components, ensure proper test coverage, maintain integration test reliability | Success: Integration plan is comprehensive and feasible, all system components work together correctly, integration points are well-tested_
++
++- [ ] 6.1 Write end-to-end tests
++  - Set up E2E testing framework
++  - Write user journey tests
++  - Add test automation
++  - _Leverage: tests/helpers/testUtils.ts, tests/fixtures/data.ts_
++  - _Requirements: All_
++  - _Prompt: Role: QA Automation Engineer with expertise in E2E testing and test frameworks like Cypress or Playwright | Task: Implement comprehensive end-to-end tests covering all requirements, setting up testing framework and user journey tests using test utilities and fixtures | Restrictions: Must test real user workflows, ensure tests are maintainable and reliable, do not test implementation details | Success: E2E tests cover all critical user journeys, tests run reliably in CI/CD pipeline, user experience is validated from end-to-end_
++
++- [ ] 6.2 Final integration and cleanup
++  - Integrate all components
++  - Fix any integration issues
++  - Clean up code and documentation
++  - _Leverage: src/utils/cleanup.ts, docs/templates/_
++  - _Requirements: All_
++  - _Prompt: Role: Senior Developer with expertise in code quality and system integration | Task: Complete final integration of all components and perform comprehensive cleanup covering all requirements, using cleanup utilities and documentation templates | Restrictions: Must not break existing functionality, ensure code quality standards are met, maintain documentation consistency | Success: All components are fully integrated and working together, code is clean and well-documented, system meets all requirements and quality standards_
+diff --git a/.spec-workflow/templates/tech-template.md b/.spec-workflow/templates/tech-template.md
+new file mode 100644
+index 0000000..57cd538
+--- /dev/null
++++ b/.spec-workflow/templates/tech-template.md
+@@ -0,0 +1,99 @@
++# Technology Stack
++
++## Project Type
++[Describe what kind of project this is: web application, CLI tool, desktop application, mobile app, library, API service, embedded system, game, etc.]
++
++## Core Technologies
++
++### Primary Language(s)
++- **Language**: [e.g., Python 3.11, Go 1.21, TypeScript, Rust, C++]
++- **Runtime/Compiler**: [if applicable]
++- **Language-specific tools**: [package managers, build tools, etc.]
++
++### Key Dependencies/Libraries
++[List the main libraries and frameworks your project depends on]
++- **[Library/Framework name]**: [Purpose and version]
++- **[Library/Framework name]**: [Purpose and version]
++
++### Application Architecture
++[Describe how your application is structured - this could be MVC, event-driven, plugin-based, client-server, standalone, microservices, monolithic, etc.]
++
++### Data Storage (if applicable)
++- **Primary storage**: [e.g., PostgreSQL, files, in-memory, cloud storage]
++- **Caching**: [e.g., Redis, in-memory, disk cache]
++- **Data formats**: [e.g., JSON, Protocol Buffers, XML, binary]
++
++### External Integrations (if applicable)
++- **APIs**: [External services you integrate with]
++- **Protocols**: [e.g., HTTP/REST, gRPC, WebSocket, TCP/IP]
++- **Authentication**: [e.g., OAuth, API keys, certificates]
++
++### Monitoring & Dashboard Technologies (if applicable)
++- **Dashboard Framework**: [e.g., React, Vue, vanilla JS, terminal UI]
++- **Real-time Communication**: [e.g., WebSocket, Server-Sent Events, polling]
++- **Visualization Libraries**: [e.g., Chart.js, D3, terminal graphs]
++- **State Management**: [e.g., Redux, Vuex, file system as source of truth]
++
++## Development Environment
++
++### Build & Development Tools
++- **Build System**: [e.g., Make, CMake, Gradle, npm scripts, cargo]
++- **Package Management**: [e.g., pip, npm, cargo, go mod, apt, brew]
++- **Development workflow**: [e.g., hot reload, watch mode, REPL]
++
++### Code Quality Tools
++- **Static Analysis**: [Tools for code quality and correctness]
++- **Formatting**: [Code style enforcement tools]
++- **Testing Framework**: [Unit, integration, and/or end-to-end testing tools]
++- **Documentation**: [Documentation generation tools]
++
++### Version Control & Collaboration
++- **VCS**: [e.g., Git, Mercurial, SVN]
++- **Branching Strategy**: [e.g., Git Flow, GitHub Flow, trunk-based]
++- **Code Review Process**: [How code reviews are conducted]
++
++### Dashboard Development (if applicable)
++- **Live Reload**: [e.g., Hot module replacement, file watchers]
++- **Port Management**: [e.g., Dynamic allocation, configurable ports]
++- **Multi-Instance Support**: [e.g., Running multiple dashboards simultaneously]
++
++## Deployment & Distribution (if applicable)
++- **Target Platform(s)**: [Where/how the project runs: cloud, on-premise, desktop, mobile, embedded]
++- **Distribution Method**: [How users get your software: download, package manager, app store, SaaS]
++- **Installation Requirements**: [Prerequisites, system requirements]
++- **Update Mechanism**: [How updates are delivered]
++
++## Technical Requirements & Constraints
++
++### Performance Requirements
++- [e.g., response time, throughput, memory usage, startup time]
++- [Specific benchmarks or targets]
++
++### Compatibility Requirements  
++- **Platform Support**: [Operating systems, architectures, versions]
++- **Dependency Versions**: [Minimum/maximum versions of dependencies]
++- **Standards Compliance**: [Industry standards, protocols, specifications]
++
++### Security & Compliance
++- **Security Requirements**: [Authentication, encryption, data protection]
++- **Compliance Standards**: [GDPR, HIPAA, SOC2, etc. if applicable]
++- **Threat Model**: [Key security considerations]
++
++### Scalability & Reliability
++- **Expected Load**: [Users, requests, data volume]
++- **Availability Requirements**: [Uptime targets, disaster recovery]
++- **Growth Projections**: [How the system needs to scale]
++
++## Technical Decisions & Rationale
++[Document key architectural and technology choices]
++
++### Decision Log
++1. **[Technology/Pattern Choice]**: [Why this was chosen, alternatives considered]
++2. **[Architecture Decision]**: [Rationale, trade-offs accepted]
++3. **[Tool/Library Selection]**: [Reasoning, evaluation criteria]
++
++## Known Limitations
++[Document any technical debt, limitations, or areas for improvement]
++
++- [Limitation 1]: [Impact and potential future solutions]
++- [Limitation 2]: [Why it exists and when it might be addressed]
+diff --git a/.spec-workflow/user-templates/README.md b/.spec-workflow/user-templates/README.md
+new file mode 100644
+index 0000000..ad36a48
+--- /dev/null
++++ b/.spec-workflow/user-templates/README.md
+@@ -0,0 +1,64 @@
++# User Templates
++
++This directory allows you to create custom templates that override the default Spec Workflow templates.
++
++## How to Use Custom Templates
++
++1. **Create your custom template file** in this directory with the exact same name as the default template you want to override:
++   - `requirements-template.md` - Override requirements document template
++   - `design-template.md` - Override design document template
++   - `tasks-template.md` - Override tasks document template
++   - `product-template.md` - Override product steering template
++   - `tech-template.md` - Override tech steering template
++   - `structure-template.md` - Override structure steering template
++
++2. **Template Loading Priority**:
++   - The system first checks this `user-templates/` directory
++   - If a matching template is found here, it will be used
++   - Otherwise, the default template from `templates/` will be used
++
++## Example Custom Template
++
++To create a custom requirements template:
++
++1. Create a file named `requirements-template.md` in this directory
++2. Add your custom structure, for example:
++
++```markdown
++# Requirements Document
++
++## Executive Summary
++[Your custom section]
++
++## Business Requirements
++[Your custom structure]
++
++## Technical Requirements
++[Your custom fields]
++
++## Custom Sections
++[Add any sections specific to your workflow]
++```
++
++## Template Variables
++
++Templates can include placeholders that will be replaced when documents are created:
++- `{{projectName}}` - The name of your project
++- `{{featureName}}` - The name of the feature being specified
++- `{{date}}` - The current date
++- `{{author}}` - The document author
++
++## Best Practices
++
++1. **Start from defaults**: Copy a default template from `../templates/` as a starting point
++2. **Keep structure consistent**: Maintain similar section headers for tool compatibility
++3. **Document changes**: Add comments explaining why sections were added/modified
++4. **Version control**: Track your custom templates in version control
++5. **Test thoroughly**: Ensure custom templates work with the spec workflow tools
++
++## Notes
++
++- Custom templates are project-specific and not included in the package distribution
++- The `templates/` directory contains the default templates which are updated with each version
++- Your custom templates in this directory are preserved during updates
++- If a custom template has errors, the system will fall back to the default template
+diff --git a/CLAUDE.md b/CLAUDE.md
+new file mode 100644
+index 0000000..5bd52c1
+--- /dev/null
++++ b/CLAUDE.md
+@@ -0,0 +1,273 @@
++# Presentation AI - AI驱动演示文稿生成系统
++
++## 变更记录 (Changelog)
++
++**2025-11-17 23:56:24** - 初始化架构扫描，完成75%覆盖率分析
++- 识别8个核心模块
++- 发现完整的演示文稿生成流程
++- 识别测试和文档缺口
++
++## 项目愿景
++
++Presentation AI 是一个基于AI的演示文稿生成平台，灵感来源于Gamma.app。用户可以通过简单的描述快速生成专业、美观的演示文稿，支持多种主题、实时编辑和导出功能。
++
++## 架构总览
++
++### 技术栈
++- **前端**: Next.js 15.5.4 + React 19.1.0 + TypeScript + Tailwind CSS
++- **后端**: Next.js API Routes + Prisma ORM + PostgreSQL
++- **认证**: NextAuth.js (Google OAuth)
++- **编辑器**: Plate.js (基于Slate/ProseMirror)
++- **AI集成**: OpenAI API + Together AI + 本地模型支持(Ollama/LM Studio)
++- **UI组件**: Radix UI + Lucide React + Framer Motion
++- **文件处理**: UploadThing
++
++### 核心功能
++- AI驱动的内容生成和演示文稿创建
++- 实时编辑和预览
++- 自定义主题系统
++- 多种布局元素和图表支持
++- 图像生成和集成
++- 演示模式
++- 导出功能(PPTX开发中)
++
++## 模块结构图
++
++```mermaid
++graph TD
++    A["(根) Presentation AI"] --> B["src/app"];
++    A --> C["src/components"];
++    A --> D["src/hooks"];
++    A --> E["src/lib"];
++    A --> F["src/server"];
++    A --> G["prisma"];
++
++    B --> B1["API Routes"];
++    B --> B2["Pages"];
++    B --> B3["Server Actions"];
++
++    C --> C1["presentation"];
++    C --> C2["plate"];
++    C --> C3["auth"];
++    C --> C4["ui"];
++    C5["globals"];
++
++    C1 --> C1A["dashboard"];
++    C1 --> C1B["editor"];
++    C1 --> C1C["theme"];
++    C1 --> C1D["outline"];
++
++    C2 --> C2A["plugins"];
++    C2 --> C2B["hooks"];
++    C2 --> C2C["ui"];
++
++    D --> D1["presentation"];
++    D --> D2["globals"];
++
++    E --> E1["presentation"];
++    E --> E2["model-picker"];
++    E --> E3["utils"];
++
++    F --> F1["auth"];
++    F --> F2["db"];
++
++    G --> G1["schema.prisma"];
++
++    click B "./src/app/CLAUDE.md" "查看应用模块文档"
++    click C "./src/components/CLAUDE.md" "查看组件模块文档"
++    click D "./src/hooks/CLAUDE.md" "查看钩子模块文档"
++    click E "./src/lib/CLAUDE.md" "查看工具库文档"
++    click F "./src/server/CLAUDE.md" "查看服务端文档"
++    click G "./prisma/CLAUDE.md" "查看数据库文档"
++```
++
++## 模块索引
++
++| 模块路径 | 类型 | 职责描述 | 覆盖率 |
++|---------|------|----------|--------|
++| `src/app` | Next.js App Router | 应用路由、API端点、服务端操作 | 高 |
++| `src/components/presentation` | React组件 | 演示文稿UI组件，包含仪表板和编辑器 | 高 |
++| `src/components/plate` | 编辑器组件 | Plate.js富文本编辑器配置和插件 | 中 |
++| `src/app/_actions` | Server Actions | 服务端操作函数，处理CRUD操作 | 中 |
++| `src/hooks` | React Hooks | 自定义钩子，状态管理和副作用 | 中 |
++| `src/lib` | 工具库 | 共享工具函数、配置和业务逻辑 | 低 |
++| `src/server` | 服务端配置 | 数据库连接和认证配置 | 低 |
++| `prisma` | 数据库 | 数据模型定义和数据库操作 | 高 |
++
++## 核心数据流
++
++```mermaid
++sequenceDiagram
++    participant U as 用户
++    participant D as Dashboard
++    participant API as API Routes
++    participant AI as AI Service
++    participant DB as Database
++
++    U->>D: 输入演示文稿主题
++    D->>API: 请求生成大纲
++    API->>AI: 调用AI模型
++    AI-->>API: 返回大纲内容
++    API-->>D: 返回大纲
++    D->>U: 显示大纲供编辑
++
++    U->>D: 确认生成演示文稿
++    D->>API: 请求生成演示文稿
++    API->>AI: 调用AI生成幻灯片
++    AI-->>API: 返回幻灯片内容
++    API->>DB: 保存演示文稿
++    API-->>D: 返回演示文稿
++    D->>U: 显示编辑界面
++```
++
++## 运行与开发
++
++### 环境要求
++- Node.js 18.x+
++- PostgreSQL 数据库
++- 必需的API密钥(OpenAI, Together AI, Google OAuth等)
++
++### 开发脚本
++```bash
++# 安装依赖
++pnpm install
++
++# 数据库初始化
++pnpm db:push
++
++# 启动开发服务器
++pnpm dev
++
++# 构建生产版本
++pnpm build
++
++# 类型检查
++pnpm type
++
++# 代码检查
++pnpm lint
++```
++
++### 环境变量配置
++参考 `.env.example` 文件，配置以下关键变量：
++- `DATABASE_URL`: PostgreSQL数据库连接
++- `OPENAI_API_KEY`: OpenAI API密钥
++- `TOGETHER_AI_API_KEY`: Together AI API密钥
++- `GOOGLE_CLIENT_ID/SECRET`: Google OAuth配置
++- `NEXTAUTH_SECRET`: NextAuth密钥
++
++## 测试策略
++
++**当前状态**: 缺失测试覆盖
++
++**建议的测试策略**:
++1. **单元测试**: 为工具函数和hooks添加测试
++2. **集成测试**: 测试API端点和数据库操作
++3. **组件测试**: 使用React Testing Library测试关键组件
++4. **E2E测试**: 使用Playwright测试完整的用户流程
++
++**推荐测试框架**: Jest + React Testing Library + Playwright
++
++## 编码规范
++
++### 代码风格
++- 使用 **Biome** 进行代码格式化和检查
++- TypeScript 严格模式
++- ESLint + Prettier 配置
++
++### 命名约定
++- 组件: PascalCase (例: `PresentationDashboard`)
++- 文件名: kebab-case (例: `presentation-dashboard.tsx`)
++- 函数/变量: camelCase
++- 常量: UPPER_SNAKE_CASE
++
++### 目录结构规范
++```
++src/
++├── app/                 # Next.js App Router
++│   ├── api/            # API路由
++│   ├── _actions/       # Server Actions
++│   └── (pages)/        # 页面组件
++├── components/         # React组件
++│   ├── presentation/   # 演示文稿相关组件
++│   ├── plate/         # 编辑器组件
++│   └── ui/            # 通用UI组件
++├── hooks/             # 自定义React钩子
++├── lib/               # 工具函数和配置
++└── server/            # 服务端配置
++```
++
++## AI使用指引
++
++### 支持的AI模型
++- **OpenAI**: GPT系列模型用于文本生成
++- **Together AI**: 图像生成模型
++- **本地模型**: 支持Ollama和LM Studio
++
++### AI功能
++1. **演示文稿大纲生成**: 基于用户输入生成结构化大纲
++2. **幻灯片内容生成**: 根据大纲生成详细幻灯片内容
++3. **图像生成**: 为幻灯片生成相关图像
++4. **网络搜索集成**: 使用Tavily API获取最新信息
++
++### 开发AI功能注意事项
++- 确保API密钥安全存储
++- 实现适当的错误处理和重试机制
++- 考虑模型响应时间和成本
++- 实现流式响应以提升用户体验
++
++## 部署建议
++
++### 生产环境
++- 推荐使用 Vercel 或 Railway
++- 配置 PostgreSQL 数据库
++- 设置环境变量
++- 配置域名和SSL
++
++### Docker部署
++项目支持Docker部署，注意以下几点：
++- 使用多阶段构建优化镜像大小
++- 正确设置环境变量
++- 数据库连接配置
++
++## 性能优化建议
++
++1. **代码分割**: 使用动态导入优化Bundle大小
++2. **图片优化**: 使用Next.js Image组件
++3. **数据库优化**: 添加适当的索引
++4. **缓存策略**: 实现API响应缓存
++5. **CDN**: 使用CDN加速静态资源
++
++## 安全考虑
++
++- API密钥不提交到版本控制
++- 实现适当的身份验证和授权
++- 输入验证和清理
++- 限制API调用频率
++- 安全的文件上传处理
++
++## 贡献指南
++
++1. Fork项目
++2. 创建功能分支
++3. 编写代码和测试
++4. 提交PR
++5. 代码审查和合并
++
++## 已知问题和改进点
++
++1. **测试覆盖**: 当前缺少完整的测试套件
++2. **错误处理**: 需要更完善的错误边界
++3. **移动端适配**: 需要改进移动端体验
++4. **性能监控**: 需要添加性能监控
++5. **文档完善**: 需要API文档和组件文档
++
++## 扩展功能路线图
++
++- [ ] 导出PDF功能
++- [ ] 实时协作
++- [ ] 模板库
++- [ ] 动画和过渡效果
++- [ ] 多语言支持
++- [ ] 插件系统
++- [ ] API开放平台
+\ No newline at end of file
+diff --git a/prisma/CLAUDE.md b/prisma/CLAUDE.md
+new file mode 100644
+index 0000000..19a38dd
+--- /dev/null
++++ b/prisma/CLAUDE.md
+@@ -0,0 +1,449 @@
++[根目录](../../CLAUDE.md) > **prisma**
++
++# Prisma数据库模块
++
++## 模块职责
++
++`prisma` 目录负责数据持久化层，包含：
++- 数据库模式定义
++- 数据迁移脚本
++- 类型安全的数据库操作
++- 关系映射和约束
++
++## 入口与启动
++
++### 核心文件
++- `schema.prisma` - 数据库模式定义
++- `migrations/` - 数据库迁移历史
++
++### 数据库配置
++```prisma
++datasource db {
++  provider = "postgresql"
++  url      = env("DATABASE_URL")
++}
++```
++
++## 数据模型架构
++
++### 核心实体关系图
++
++```mermaid
++erDiagram
++    User ||--o{ BaseDocument : owns
++    User ||--o{ CustomTheme : creates
++    User ||--o{ FavoriteDocument : favorites
++    User ||--o{ GeneratedImage : generates
++    User ||--o{ Account : has
++
++    BaseDocument ||--|| Presentation : contains
++    Presentation }o--|| CustomTheme : uses
++
++    BaseDocument ||--o{ FavoriteDocument : favorited_by
++
++    User {
++        string id PK
++        string name
++        string email UK
++        string password
++        string image
++        string headline
++        string bio
++        string[] interests
++        string location
++        string website
++        UserRole role
++        boolean hasAccess
++        datetime createdAt
++        datetime updatedAt
++    }
++
++    BaseDocument {
++        string id PK
++        string title
++        DocumentType type
++        string userId FK
++        string thumbnailUrl
++        datetime createdAt
++        datetime updatedAt
++        boolean isPublic
++        string documentType
++    }
++
++    Presentation {
++        string id PK
++        json content
++        string theme
++        string imageSource
++        string prompt
++        string presentationStyle
++        string language
++        string[] outline
++        json searchResults
++        string templateId
++        string customThemeId FK
++    }
++
++    CustomTheme {
++        string id PK
++        string name
++        string description
++        string userId FK
++        string logoUrl
++        boolean isPublic
++        json themeData
++        datetime createdAt
++        datetime updatedAt
++    }
++```
++
++## 数据模型详解
++
++### 用户系统 (User Management)
++
++#### User 模型
++```prisma
++model User {
++    id            String    @id @default(cuid())
++    name          String?
++    email         String?   @unique
++    password      String?
++    emailVerified DateTime?
++    image         String?
++    createdAt     DateTime  @default(now())
++    updatedAt     DateTime  @default(now()) @updatedAt
++    headline      String?   @db.VarChar(100)
++    bio           String?   @db.Text
++    interests     String[]
++    location      String?
++    website       String?
++    accounts      Account[]
++    role          UserRole  @default(USER)
++    hasAccess     Boolean   @default(false)
++
++    // 关联关系
++    documents       BaseDocument[]
++    favorites       FavoriteDocument[]
++    CustomTheme     CustomTheme[]
++    GeneratedImage  GeneratedImage[]
++}
++```
++
++#### Account 模型 (NextAuth集成)
++```prisma
++model Account {
++    id                       String  @id @default(cuid())
++    userId                   String
++    type                     String
++    provider                 String
++    providerAccountId        String
++    refresh_token            String?
++    access_token             String?
++    expires_at               Int?
++    token_type               String?
++    scope                    String?
++    id_token                 String?
++    session_state            String?
++    user                     User    @relation(fields: [userId], references: [id])
++
++    @@unique([provider, providerAccountId])
++}
++```
++
++### 文档系统 (Document System)
++
++#### BaseDocument 模型
++```prisma
++model BaseDocument {
++    id           String        @id @default(cuid())
++    title        String
++    type         DocumentType
++    userId       String
++    user         User          @relation(fields: [userId], references: [id])
++    thumbnailUrl String?
++    createdAt    DateTime      @default(now())
++    updatedAt    DateTime      @updatedAt
++    isPublic     Boolean       @default(false)
++    documentType String
++    presentation Presentation?
++    favorites    FavoriteDocument[]
++}
++
++enum DocumentType {
++    NOTE
++    DOCUMENT
++    DRAWING
++    DESIGN
++    STICKY_NOTES
++    MIND_MAP
++    RAG
++    RESEARCH_PAPER
++    FLIPBOOK
++    PRESENTATION
++}
++```
++
++### 演示文稿系统 (Presentation System)
++
++#### Presentation 模型
++```prisma
++model Presentation {
++    id                String       @id @default(cuid())
++    content           Json         // 幻灯片内容，包含主题等
++    theme             String       @default("default")
++    imageSource       String       @default("ai")
++    prompt            String?      // 用户原始提示
++    presentationStyle String?      // 演示风格
++    language          String?      @default("en-US")
++    outline           String[]     // 大纲内容
++    searchResults     Json?        // 搜索结果
++    base              BaseDocument @relation(fields: [id], references: [id], onDelete: Cascade)
++    templateId        String?
++    customThemeId     String?
++    customTheme       CustomTheme? @relation(fields: [customThemeId], references: [id])
++}
++```
++
++### 主题系统 (Theme System)
++
++#### CustomTheme 模型
++```prisma
++model CustomTheme {
++    id          String   @id @default(cuid())
++    name        String
++    description String?
++    userId      String
++    user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
++    logoUrl     String?
++    isPublic    Boolean  @default(false)
++    createdAt   DateTime @default(now())
++    updatedAt   DateTime @updatedAt
++    themeData   Json     // 完整主题配置
++    presentations Presentation[]
++
++    @@index([userId])
++}
++```
++
++### 辅助系统 (Auxiliary Systems)
++
++#### FavoriteDocument 模型
++```prisma
++model FavoriteDocument {
++    id         String       @id @default(uuid())
++    documentId String
++    document   BaseDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
++    userId     String
++    user       User         @relation(fields: [userId], references: [id])
++}
++```
++
++#### GeneratedImage 模型
++```prisma
++model GeneratedImage {
++    id        String   @id @default(cuid())
++    url       String
++    createdAt DateTime @default(now())
++    updatedAt DateTime @updatedAt
++    userId    String
++    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
++    prompt    String
++}
++```
++
++## 数据库操作模式
++
++### 常用查询模式
++
++#### 用户相关查询
++```typescript
++// 获取用户及其演示文稿
++const userWithPresentations = await db.user.findUnique({
++  where: { id: userId },
++  include: {
++    documents: {
++      where: { type: 'PRESENTATION' },
++      include: { presentation: true }
++    }
++  }
++});
++
++// 获取用户自定义主题
++const userThemes = await db.customTheme.findMany({
++  where: { userId },
++  orderBy: { createdAt: 'desc' }
++});
++```
++
++#### 演示文稿查询
++```typescript
++// 创建演示文稿
++const presentation = await db.baseDocument.create({
++  data: {
++    type: 'PRESENTATION',
++    documentType: 'presentation',
++    title: title,
++    userId,
++    presentation: {
++      create: {
++        content: content,
++        theme: theme,
++        outline: outline,
++      }
++    }
++  },
++  include: { presentation: true }
++});
++
++// 搜索演示文稿
++const presentations = await db.baseDocument.findMany({
++  where: {
++    userId,
++    type: 'PRESENTATION',
++    title: { contains: searchTerm }
++  },
++  include: { presentation: true }
++});
++```
++
++## 索引和性能
++
++### 已定义索引
++```prisma
++// CustomTheme表的用户ID索引
++@@index([userId])
++
++// Account表的唯一索引
++@@unique([provider, providerAccountId])
++```
++
++### 建议添加的索引
++```sql
++-- 演示文稿查询优化
++CREATE INDEX idx_base_document_user_type ON "BaseDocument"(userId, type);
++CREATE INDEX idx_base_document_created_at ON "BaseDocument"(createdAt DESC);
++
++-- 用户查询优化
++CREATE INDEX idx_user_email ON "User"(email);
++CREATE INDEX idx_user_has_access ON "User"(hasAccess);
++
++-- 收藏查询优化
++CREATE INDEX idx_favorite_user_document ON "FavoriteDocument"(userId, documentId);
++```
++
++## 数据迁移
++
++### 迁移命令
++```bash
++# 生成迁移文件
++npx prisma migrate dev --name <migration_name>
++
++# 应用迁移
++npx prisma migrate deploy
++
++# 重置数据库
++npx prisma migrate reset
++
++# 推送模式更改(开发环境)
++npx prisma db push
++```
++
++### 迁移文件结构
++```
++prisma/migrations/
++├── migration_lock.toml
++└── 20240101000000_init/
++    ├── migration.sql
++    └── README.md
++```
++
++## 数据完整性
++
++### 外键约束
++- 所有关系模型都有适当的外键约束
++- 使用 `onDelete: Cascade` 确保数据一致性
++- 用户删除时级联删除相关数据
++
++### 数据验证
++- 使用 `@db.VarChar(100)` 限制字段长度
++- 枚举类型确保数据有效性
++- 必需字段使用 `@default` 提供默认值
++
++## 测试与质量
++
++**当前测试状态**: 无数据库测试
++
++**建议测试策略**:
++1. **单元测试**: 测试数据模型和基本CRUD操作
++2. **集成测试**: 测试复杂查询和事务
++3. **性能测试**: 测试大数据量下的查询性能
++4. **数据完整性测试**: 验证约束和级联删除
++
++**测试工具**:
++- Jest + Supertest
++- Prisma Test Client
++- 数据库 seeding 脚本
++
++## 备份和恢复
++
++### 备份策略
++```bash
++# PostgreSQL备份
++pg_dump -h localhost -U username -d database_name > backup.sql
++
++# 压缩备份
++pg_dump -h localhost -U username -d database_name | gzip > backup.sql.gz
++```
++
++### 恢复策略
++```bash
++# 从备份恢复
++psql -h localhost -U username -d database_name < backup.sql
++
++# 从压缩备份恢复
++gunzip -c backup.sql.gz | psql -h localhost -U username -d database_name
++```
++
++## 常见问题 (FAQ)
++
++### Q: 如何添加新的文档类型？
++A: 在 `DocumentType` 枚举中添加新类型，并更新相关业务逻辑。
++
++### Q: 如何处理演示文稿内容的版本控制？
++A: 考虑添加 `PresentationVersion` 模型来跟踪内容变更历史。
++
++### Q: 如何优化大量演示文稿的查询性能？
++A: 添加复合索引，实现分页查询，考虑使用缓存。
++
++## 扩展建议
++
++### 短期改进
++1. **添加软删除**: 为主要模型添加 `deletedAt` 字段
++2. **审计日志**: 记录重要数据变更
++3. **性能监控**: 添加查询性能跟踪
++
++### 长期扩展
++1. **全文搜索**: 集成PostgreSQL的全文搜索
++2. **数据分区**: 按时间或用户分区大表
++3. **读写分离**: 实现主从数据库架构
++
++## 相关文件清单
++
++### 核心文件
++- `schema.prisma` - 数据库模式定义
++- `migrations/` - 数据库迁移文件
++
++### 配置文件
++- `.env` - 数据库连接配置
++- `package.json` - Prisma依赖版本
++
++### 脚本文件
++- `scripts/db-seed.ts` - 数据库种子数据(如果存在)
++
++## 变更记录 (Changelog)
++
++**2025-11-17 23:56:24** - 初始化数据库文档
++- 分析了完整的数据模型
++- 绘制了实体关系图
++- 识别了性能优化机会
++- 建议了测试和备份策略
+\ No newline at end of file
+diff --git a/src/app/CLAUDE.md b/src/app/CLAUDE.md
+new file mode 100644
+index 0000000..d84e0fb
+--- /dev/null
++++ b/src/app/CLAUDE.md
+@@ -0,0 +1,206 @@
++[根目录](../../../CLAUDE.md) > **app**
++
++# App模块 - Next.js应用路由
++
++## 模块职责
++
++`src/app` 目录是Next.js 13+ App Router的核心模块，负责：
++- 应用路由和页面定义
++- API端点实现
++- 服务端操作(Server Actions)
++- 全局布局和元数据配置
++
++## 入口与启动
++
++### 主要入口文件
++- `layout.tsx` - 根布局组件，配置全局Provider
++- `page.tsx` - 首页组件(当前为默认Next.js页面)
++
++### 布局结构
++```typescript
++// layout.tsx
++<QueryProvider>
++  <AuthProvider>
++    <ThemeProvider>
++      {children}
++    </ThemeProvider>
++  </AuthProvider>
++</QueryProvider>
++```
++
++## 对外接口
++
++### API路由
++
++| 路径 | 方法 | 功能 | 状态 |
++|------|------|------|------|
++| `/api/auth/[...nextauth]` | ALL | NextAuth.js认证 | 生产就绪 |
++| `/api/presentation/generate` | POST | 生成演示文稿内容 | 核心功能 |
++| `/api/presentation/outline` | POST | 生成演示文稿大纲 | 核心功能 |
++| `/api/presentation/outline-with-search` | POST | 带搜索的大纲生成 | 高级功能 |
++| `/api/uploadthing` | POST | 文件上传处理 | 完整 |
++
++### 核心API实现
++
++#### 演示文稿生成 API
++```typescript
++// api/presentation/generate/route.ts
++interface SlidesRequest {
++  title: string;
++  prompt: string;
++  outline: string[];
++  language: string;
++  tone: string;
++  modelProvider?: string;
++  modelId?: string;
++  searchResults?: Array<{query: string; results: unknown[]}>;
++}
++```
++
++**特性**:
++- 支持多种AI模型(OpenAI, Ollama, LM Studio)
++- 流式响应实现
++- 多种布局模板
++- 图像生成集成
++
++## 关键依赖与配置
++
++### Server Actions
++位于 `_actions/` 目录，负责服务端业务逻辑：
++
++#### 演示文稿操作
++- `presentationActions.ts` - 演示文稿CRUD操作
++- `theme-actions.ts` - 主题管理
++- `fetchPresentations.ts` - 演示文稿查询
++- `exportPresentationActions.ts` - 导出功能
++- `sharedPresentationActions.ts` - 共享操作
++
++#### 图像操作
++- `image/generate.ts` - AI图像生成
++- `image/unsplash.ts` - Unsplash图片获取
++
++### 环境配置
++通过 `../env.js` 统一管理环境变量：
++```typescript
++export const env = createEnv({
++  server: {
++    DATABASE_URL: z.string().url(),
++    OPENAI_API_KEY: z.string(),
++    // ... 其他配置
++  }
++});
++```
++
++## 页面路由结构
++
++```
++src/app/
++├── layout.tsx              # 根布局
++├── page.tsx               # 首页
++├── loading.tsx            # 加载状态
++├── globals.css            # 全局样式
++├── auth/                  # 认证页面
++│   ├── signin/
++│   └── signout/
++├── presentation/          # 演示文稿页面
++│   ├── page.tsx          # 演示文稿列表
++│   ├── layout.tsx        # 演示文稿布局
++│   ├── [id]/             # 演示文稿详情
++│   └── generate/[id]/    # 生成页面
++├── api/                  # API路由
++│   ├── auth/
++│   ├── presentation/
++│   └── uploadthing/
++└── _actions/             # Server Actions
++    ├── presentation/
++    └── image/
++```
++
++## 数据流架构
++
++```mermaid
++graph TD
++    A[客户端请求] --> B[API路由]
++    B --> C[Server Actions]
++    C --> D[数据库操作]
++    D --> C
++    C --> E[AI服务调用]
++    E --> C
++    C --> B
++    B --> A
++
++    F[UI组件] --> G[Server Actions]
++    G --> H[Prisma ORM]
++    H --> I[PostgreSQL]
++```
++
++## 测试与质量
++
++**当前测试状态**: 无测试覆盖
++
++**建议测试策略**:
++1. **API路由测试**: 测试所有端点的请求/响应
++2. **Server Actions测试**: 测试服务端业务逻辑
++3. **集成测试**: 测试完整的API流程
++4. **认证测试**: 测试登录/登出流程
++
++**推荐工具**:
++- Jest + Supertest (API测试)
++- Next.js内置测试工具
++
++## 常见问题 (FAQ)
++
++### Q: 如何添加新的API端点？
++A: 在 `src/app/api/` 下创建对应目录的 `route.ts` 文件，遵循Next.js 13+ App Router约定。
++
++### Q: Server Actions与API路由的选择？
++A:
++- **Server Actions**: 用于组件直接调用的服务端操作
++- **API路由**: 用于外部客户端调用的HTTP接口
++
++### Q: 如何处理AI模型的流式响应？
++A: 参考 `/api/presentation/generate/route.ts` 中的 `streamText` 实现。
++
++## 性能考虑
++
++1. **缓存策略**: 对AI响应实施适当缓存
++2. **请求限制**: 实施API调用频率限制
++3. **数据库优化**: 使用适当的索引和查询优化
++4. **流式响应**: 对长时间运行的AI操作使用流式传输
++
++## 安全要点
++
++1. **输入验证**: 所有API输入需要验证
++2. **认证授权**: 确保用户只能访问自己的数据
++3. **API密钥保护**: 安全存储和使用AI服务密钥
++4. **文件上传**: 实施文件类型和大小限制
++
++## 相关文件清单
++
++### 核心文件
++- `layout.tsx` - 应用根布局
++- `page.tsx` - 首页
++- `loading.tsx` - 全局加载组件
++
++### API路由
++- `api/auth/[...nextauth]/route.ts` - 认证API
++- `api/presentation/generate/route.ts` - 演示文稿生成
++- `api/presentation/outline/route.ts` - 大纲生成
++- `api/uploadthing/route.ts` - 文件上传
++
++### Server Actions
++- `_actions/presentation/presentationActions.ts` - 演示文稿操作
++- `_actions/presentation/theme-actions.ts` - 主题管理
++- `_actions/image/generate.ts` - 图像生成
++
++### 页面组件
++- `presentation/page.tsx` - 演示文稿列表页
++- `presentation/[id]/page.tsx` - 演示文稿详情页
++- `auth/signin/page.tsx` - 登录页面
++
++## 变更记录 (Changelog)
++
++**2025-11-17 23:56:24** - 初始化文档创建
++- 分析了完整的API路由结构
++- 识别了Server Actions的组织方式
++- 记录了主要的功能模块
+\ No newline at end of file
+diff --git a/src/components/CLAUDE.md b/src/components/CLAUDE.md
+new file mode 100644
+index 0000000..c38a034
+--- /dev/null
++++ b/src/components/CLAUDE.md
+@@ -0,0 +1,253 @@
++[根目录](../../../CLAUDE.md) > **components**
++
++# Components模块 - React组件库
++
++## 模块职责
++
++`src/components` 目录包含所有React组件，主要负责：
++- 演示文稿相关UI组件
++- Plate.js富文本编辑器配置
++- 用户认证组件
++- 通用UI组件库
++- 全局状态和上下文
++
++## 入口与启动
++
++### 主要组件分类
++- `presentation/` - 演示文稿核心组件
++- `plate/` - 富文本编辑器组件
++- `auth/` - 认证相关组件
++- `ui/` - 通用UI组件
++- `globals/` - 全局组件和配置
++
++## 对外接口
++
++### 演示文稿组件 (presentation/)
++
++#### 仪表板组件
++| 组件 | 路径 | 功能 |
++|------|------|------|
++| `PresentationDashboard` | `dashboard/PresentationDashboard.tsx` | 主仪表板界面 |
++| `PresentationInput` | `dashboard/PresentationInput.tsx` | 演示文稿输入表单 |
++| `ModelPicker` | `dashboard/ModelPicker.tsx` | AI模型选择器 |
++| `PresentationExamples` | `dashboard/PresentationExamples.tsx` | 示例演示文稿 |
++| `RecentPresentations` | `dashboard/RecentPresentations.tsx` | 最近演示文稿列表 |
++
++#### 编辑器组件
++| 组件 | 路径 | 功能 |
++|------|------|------|
++| 自定义元素 | `editor/custom-elements/` | 50+种幻灯片元素类型 |
++| 拖拽功能 | `editor/dnd/` | 幻灯片拖拽重排 |
++| 静态版本 | `editor/custom-elements/static/` | 展示版本组件 |
++
++#### 自定义元素类型
++```typescript
++// 主要自定义元素类型
++- presentation-heading-element.tsx      // 标题元素
++- presentation-paragraph-element.tsx     // 段落元素
++- presentation-image-element.tsx         // 图像元素
++- presentation-table-node.tsx            // 表格元素
++- bar-graph.tsx                          // 柱状图
++- pie-chart.tsx                          // 饼图
++- line-graph.tsx                         // 折线图
++- area-chart.tsx                         // 面积图
++- radar-chart.tsx                        // 雷达图
++- scatter-plot.tsx                       // 散点图
++- pyramid.tsx                            // 金字塔图
++- staircase.tsx                          // 阶梯图
++- cycle-element.tsx                      // 循环图
++- arrow-list.tsx                         // 箭头列表
++- icon-list.tsx                          // 图标列表
++- pros-cons.tsx                          // 优缺点对比
++- before-after.tsx                       // 前后对比
++- compare.tsx                            // 比较图
++```
++
++### Plate编辑器组件 (plate/)
++
++#### 插件系统
++| 插件类型 | 功能 | 状态 |
++|----------|------|------|
++| AI插件 | AI内容生成 | 完整 |
++| 基础节点 | 段落、标题等 | 完整 |
++| 列表插件 | 有序/无序列表 | 完整 |
++| 表格插件 | 表格编辑 | 完整 |
++| 链接插件 | 链接管理 | 完整 |
++| 图像插件 | 图像插入和编辑 | 完整 |
++| 数学公式 | LaTeX数学公式 | 完整 |
++| Markdown支持 | Markdown语法 | 完整 |
++| 代码块 | 代码高亮 | 完整 |
++| 评论功能 | 协作评论 | 完整 |
++
++#### 编辑器配置
++```typescript
++// editor-kit.tsx - 主要编辑器配置
++const plugins = [
++  aiKit,
++  basicBlocksKit,
++  basicMarksKit,
++  listKit,
++  tableKit,
++  linkKit,
++  mediaKit,
++  mathKit,
++  // ... 更多插件
++];
++```
++
++### 认证组件 (auth/)
++- `Dropdown.tsx` - 用户菜单下拉
++- `auth-button-components.tsx` - 认证按钮组件
++
++### 通用UI组件 (ui/)
++基于Radix UI构建的组件库，包含：
++- 按钮、输入框、选择器等基础组件
++- 对话框、抽屉、弹出框等交互组件
++- 数据展示组件
++
++## 关键依赖与配置
++
++### 主要依赖
++```json
++{
++  "@platejs/*": "富文本编辑器",
++  "@radix-ui/*": "UI基础组件",
++  "@dnd-kit/*": "拖拽功能",
++  "framer-motion": "动画效果",
++  "recharts": "图表组件",
++  "lucide-react": "图标库"
++}
++```
++
++### 样式系统
++- **Tailwind CSS**: 主要样式框架
++- **Radix UI**: 无样式可访问组件
++- **自定义主题**: 支持亮/暗模式切换
++
++## 组件架构设计
++
++### 分层架构
++```mermaid
++graph TD
++    A[Pages/App Router] --> B[Page Components]
++    B --> C[Presentation Components]
++    B --> D[Plate Editor Components]
++    B --> E[Auth Components]
++    B --> F[UI Components]
++
++    F --> G[Radix UI Primitives]
++    D --> H[Plate.js Core]
++    C --> I[Custom Elements]
++
++    J[Hooks] --> B
++    K[States] --> B
++```
++
++### 组件通信模式
++1. **Props传递**: 父子组件数据传递
++2. **Context**: 全局状态(主题、认证等)
++3. **自定义Hooks**: 复杂状态逻辑封装
++4. **Zustand**: 跨组件状态管理
++
++## 状态管理
++
++### 主要状态
++- **演示文稿状态**: 当前编辑的演示文稿数据
++- **用户状态**: 登录用户信息
++- **主题状态**: UI主题(亮/暗模式)
++- **编辑器状态**: Plate编辑器状态
++
++### 状态管理工具
++- **React Context**: 全局状态
++- **Zustand**: 跨组件状态
++- **Server Actions**: 服务端状态同步
++
++## 测试与质量
++
++**当前测试状态**: 无组件测试
++
++**建议测试策略**:
++1. **单元测试**: 测试组件的渲染和交互
++2. **快照测试**: 确保UI一致性
++3. **可访问性测试**: 使用testing-library测试可访问性
++4. **集成测试**: 测试组件组合和用户流程
++
++**推荐工具**:
++- React Testing Library
++- Jest
++- Storybook (组件文档)
++
++## 性能优化
++
++### 已实现优化
++- **代码分割**: 动态导入大型组件
++- **组件懒加载**: 减少初始Bundle大小
++- **图像优化**: Next.js Image组件集成
++
++### 建议优化
++1. **虚拟化**: 大列表组件虚拟化
++2. **记忆化**: React.memo和useMemo优化
++3. **Bundle分析**: 监控组件大小
++
++## 可访问性
++
++### 实现功能
++- **键盘导航**: 支持Tab键导航
++- **屏幕阅读器**: 适当的ARIA标签
++- **颜色对比**: 符合WCAG标准
++- **焦点管理**: 清晰的焦点指示
++
++### 工具
++- Radix UI内置可访问性
++- 自定义钩子管理焦点
++
++## 常见问题 (FAQ)
++
++### Q: 如何创建新的自定义元素？
++A: 在 `src/components/presentation/editor/custom-elements/` 下创建新组件，并在解析器中注册。
++
++### Q: Plate编辑器如何集成自定义插件？
++A: 参考 `src/components/plate/plugins/` 中的现有插件，使用Plate.js的插件API。
++
++### Q: 拖拽功能如何实现？
++A: 使用 `@dnd-kit` 库，在 `editor/dnd/` 目录中实现拖拽逻辑。
++
++## 相关文件清单
++
++### 演示文稿组件
++```
++presentation/
++├── dashboard/           # 仪表板相关组件
++├── editor/             # 编辑器组件
++│   ├── custom-elements/ # 自定义元素
++│   ├── dnd/           # 拖拽功能
++│   └── native-elements/ # 原生元素
++├── theme/             # 主题组件
++├── outline/           # 大纲编辑组件
++└── utils/             # 演示文稿工具
++```
++
++### Plate编辑器组件
++```
++plate/
++├── plugins/           # 编辑器插件
++├── hooks/            # 编辑器钩子
++├── ui/               # 编辑器UI组件
++├── lib/              # 编辑器库文件
++└── utils/            # 编辑器工具
++```
++
++### 其他组件
++```
++auth/                 # 认证组件
++globals/             # 全局组件
++ui/                  # 通用UI组件
++```
++
++## 变更记录 (Changelog)
++
++**2025-11-17 23:56:24** - 初始化组件文档
++- 分析了50+自定义元素类型
++- 记录了Plate编辑器插件系统
++- 识别了组件架构模式
++- 发现了测试覆盖缺口
+\ No newline at end of file
+-- 
+2.51.2.windows.1
+
