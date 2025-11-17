@@ -1,0 +1,303 @@
+{
+  "timestamp": "2025-11-17T23:56:24+08:00",
+  "projectName": "presentation-ai",
+  "projectType": "Next.js Full-Stack Application",
+  "language": "TypeScript",
+  "framework": "Next.js 15.5.4",
+  "database": "PostgreSQL with Prisma ORM",
+  "scanSummary": {
+    "totalFilesScanned": 280,
+    "estimatedTotalFiles": 320,
+    "coveragePercentage": 87,
+    "truncated": false,
+    "scanPhase": "B (Module Priority Scan)",
+    "duration": "moderate"
+  },
+  "fileStatistics": {
+    "typeScript": 63,
+    "typeScriptReact": 195,
+    "javascript": 4,
+    "javascriptReact": 0,
+    "prisma": 1,
+    "config": 8,
+    "other": 9
+  },
+  "modules": [
+    {
+      "path": "src/app",
+      "type": "Next.js App Router",
+      "description": "主要的应用路由和API端点",
+      "entryPoints": [
+        "src/app/layout.tsx",
+        "src/app/page.tsx"
+      ],
+      "apiRoutes": [
+        "src/app/api/auth/[...nextauth]/route.ts",
+        "src/app/api/presentation/generate/route.ts",
+        "src/app/api/presentation/outline/route.ts",
+        "src/app/api/presentation/outline-with-search/route.ts",
+        "src/app/api/uploadthing/route.ts"
+      ],
+      "pages": [
+        "src/app/auth/signin/page.tsx",
+        "src/app/auth/signout/page.tsx",
+        "src/app/presentation/page.tsx",
+        "src/app/presentation/[id]/page.tsx",
+        "src/app/presentation/generate/[id]/page.tsx"
+      ],
+      "serverActions": [
+        "src/app/_actions/presentation/presentationActions.ts",
+        "src/app/_actions/presentation/theme-actions.ts",
+        "src/app/_actions/presentation/fetchPresentations.ts",
+        "src/app/_actions/image/generate.ts",
+        "src/app/_actions/image/unsplash.ts"
+      ],
+      "keyFeatures": ["NextAuth.js认证", "演示文稿生成API", "文件上传", "Server Actions"],
+      "coverage": "high",
+      "docCreated": true
+    },
+    {
+      "path": "src/components/presentation",
+      "type": "React组件模块",
+      "description": "演示文稿相关的UI组件，包括仪表板、编辑器和自定义元素",
+      "subModules": [
+        {
+          "path": "dashboard",
+          "description": "演示文稿仪表板组件",
+          "componentCount": 15
+        },
+        {
+          "path": "editor",
+          "description": "演示文稿编辑器，包含丰富的自定义元素",
+          "componentCount": 100
+        },
+        {
+          "path": "theme",
+          "description": "主题相关组件",
+          "componentCount": 5
+        },
+        {
+          "path": "outline",
+          "description": "大纲编辑组件",
+          "componentCount": 3
+        }
+      ],
+      "customElements": 50,
+      "staticElements": 50,
+      "dndComponents": 10,
+      "keyFeatures": ["Plate编辑器集成", "拖拽功能", "自定义图表元素", "图像编辑", "丰富的布局模板"],
+      "coverage": "high",
+      "docCreated": true
+    },
+    {
+      "path": "src/components/plate",
+      "type": "Plate编辑器模块",
+      "description": "基于Plate.js的富文本编辑器配置和插件",
+      "plugins": [
+        "ai-kit", "basic-blocks-kit", "basic-marks-kit", "list-kit",
+        "table-kit", "link-kit", "media-kit", "math-kit", "markdown-kit",
+        "code-block-kit", "comment-kit", "dnd-kit", "font-kit"
+      ],
+      "hooks": [
+        "use-debounce", "use-is-touch-device", "use-upload-file",
+        "use-mounted", "usePlateEditor", "use-floating-toolbar"
+      ],
+      "uiComponents": 80,
+      "keyFeatures": ["AI插件", "Markdown支持", "数学公式", "表格", "拖拽", "富文本编辑"],
+      "coverage": "medium",
+      "docCreated": true
+    },
+    {
+      "path": "src/app/_actions",
+      "type": "Server Actions",
+      "description": "服务端操作函数",
+      "keyFiles": [
+        "presentationActions.ts",
+        "theme-actions.ts",
+        "fetchPresentations.ts",
+        "exportPresentationActions.ts",
+        "sharedPresentationActions.ts",
+        "image/generate.ts",
+        "image/unsplash.ts"
+      ],
+      "keyFeatures": ["演示文稿CRUD", "主题管理", "图像生成", "文件上传", "导出功能"],
+      "coverage": "medium"
+    },
+    {
+      "path": "src/hooks",
+      "type": "React Hooks",
+      "description": "自定义React钩子函数",
+      "keyFiles": [
+        "presentation/usePresentationSlides.tsx",
+        "presentation/useLocalModels.ts",
+        "presentation/useDebouncedSave.ts",
+        "presentation/useSlideChangeWatcher.ts",
+        "presentation/useSlideOperations.ts",
+        "presentation/useRootImageActions.ts",
+        "globals/useUploadthing.ts",
+        "use-mobile.tsx"
+      ],
+      "keyFeatures": ["演示文稿状态管理", "本地模型支持", "自动保存", "拖拽操作"],
+      "coverage": "medium"
+    },
+    {
+      "path": "src/lib",
+      "type": "工具库",
+      "description": "共享工具函数和配置",
+      "keyFiles": [
+        "model-picker.ts",
+        "presentation/themes.ts",
+        "utils.ts",
+        "thinking-extractor.ts"
+      ],
+      "keyFeatures": ["AI模型选择", "主题系统", "通用工具", "思维提取"],
+      "coverage": "low"
+    },
+    {
+      "path": "src/server",
+      "type": "服务端配置",
+      "description": "数据库和认证配置",
+      "keyFiles": [
+        "auth.ts",
+        "db.ts"
+      ],
+      "keyFeatures": ["NextAuth配置", "Prisma数据库连接"],
+      "coverage": "low"
+    },
+    {
+      "path": "src/components",
+      "type": "基础组件模块",
+      "description": "通用UI组件和认证组件",
+      "subModules": [
+        {
+          "path": "auth",
+          "description": "认证相关组件"
+        },
+        {
+          "path": "ui",
+          "description": "通用UI组件库"
+        },
+        {
+          "path": "globals",
+          "description": "全局组件"
+        }
+      ],
+      "coverage": "medium",
+      "docCreated": true
+    },
+    {
+      "path": "prisma",
+      "type": "数据库模块",
+      "description": "Prisma数据库模式和迁移",
+      "keyFiles": [
+        "schema.prisma"
+      ],
+      "models": ["User", "BaseDocument", "Presentation", "CustomTheme", "Account", "FavoriteDocument", "GeneratedImage"],
+      "keyFeatures": ["PostgreSQL数据库", "用户管理", "演示文稿存储", "自定义主题", "NextAuth集成"],
+      "coverage": "high",
+      "docCreated": true
+    }
+  ],
+  "gaps": [
+    {
+      "area": "测试",
+      "status": "missing",
+      "severity": "high",
+      "description": "项目中未发现测试文件，缺少单元测试、集成测试和E2E测试",
+      "recommendation": "添加Jest + React Testing Library + Playwright测试框架，为关键模块编写测试"
+    },
+    {
+      "area": "错误处理",
+      "status": "partial",
+      "severity": "medium",
+      "description": "API路由中有基本错误处理，但缺少React错误边界和统一错误处理机制",
+      "recommendation": "添加React Error Boundary组件，实现统一的API错误处理和用户友好的错误提示"
+    },
+    {
+      "area": "文档",
+      "status": "basic",
+      "severity": "medium",
+      "description": "有基础的README，但缺少API文档、组件文档和使用示例",
+      "recommendation": "为API端点添加OpenAPI/Swagger文档，为核心组件添加Storybook文档"
+    },
+    {
+      "area": "性能监控",
+      "status": "missing",
+      "severity": "medium",
+      "description": "缺少性能监控和分析工具",
+      "recommendation": "集成Web Vitals，添加性能分析工具，监控Bundle大小和加载时间"
+    },
+    {
+      "area": "国际化",
+      "status": "missing",
+      "severity": "low",
+      "description": "项目支持多语言演示文稿生成，但界面本身未国际化",
+      "recommendation": "集成next-intl或react-i18next，实现界面国际化"
+    }
+  ],
+  "ignoredFiles": {
+    "node_modules": "依赖包目录",
+    ".next": "Next.js构建输出",
+    ".git": "Git版本控制",
+    "pnpm-lock.yaml": "包管理器锁定文件",
+    "*.log": "日志文件",
+    "dist": "构建输出目录",
+    "build": "构建输出目录"
+  },
+  "nextSteps": [
+    "深度扫描src/lib目录，了解完整工具函数库实现",
+    "分析src/components/presentation/editor/custom-elements中的所有自定义元素类型和用法",
+    "检查API路由的完整实现，特别是错误处理和安全性",
+    "分析状态管理策略，了解Zustand的使用情况",
+    "检查主题系统的完整实现和数据结构",
+    "分析演示文稿导出功能(PPTX)的实现情况",
+    "审查AI模型选择和集成的实现细节",
+    "检查拖拽功能的完整实现和用户体验"
+  ],
+  "techStack": {
+    "frontend": ["Next.js 15.5.4", "React 19.1.0", "TypeScript", "Tailwind CSS", "Radix UI"],
+    "backend": ["Next.js API Routes", "Prisma ORM", "PostgreSQL", "NextAuth.js"],
+    "editor": ["Plate.js", "ProseMirror", "Slate"],
+    "ai": ["OpenAI API", "Together AI", "Ollama", "LM Studio", "Tavily API"],
+    "ui": ["Radix UI", "Lucide React", "Framer Motion", "DND Kit"],
+    "tools": ["Biome", "ESLint", "TypeScript", "PNPM"],
+    "charts": ["Recharts", "自定义图表组件"]
+  },
+  "dependencies": {
+    "total": 162,
+    "categories": {
+      "ai": 8,
+      "ui": 25,
+      "editor": 20,
+      "database": 2,
+      "auth": 2,
+      "styling": 5,
+      "utilities": 15,
+      "react": 10,
+      "next": 3,
+      "charts": 3,
+      "dnd": 3,
+      "files": 2
+    }
+  },
+  "documentationCreated": [
+    "CLAUDE.md (根级别)",
+    "src/app/CLAUDE.md",
+    "src/components/CLAUDE.md",
+    "prisma/CLAUDE.md"
+  ],
+  "codeQuality": {
+    "typeScript": true,
+    "strictMode": true,
+    "eslint": true,
+    "prettier": true,
+    "biome": true
+  },
+  "architecture": {
+    "pattern": "Full-stack Next.js with App Router",
+    "stateManagement": "React Context + Zustand",
+    "styling": "Tailwind CSS + Radix UI",
+    "database": "PostgreSQL + Prisma ORM",
+    "authentication": "NextAuth.js"
+  }
+}
