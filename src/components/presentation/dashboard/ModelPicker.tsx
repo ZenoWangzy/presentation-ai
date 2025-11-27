@@ -36,7 +36,7 @@ export function ModelPicker({
       if (savedModel) {
         console.log("Restoring model from localStorage:", savedModel);
         setModelProvider(
-          savedModel.modelProvider as "openai" | "ollama" | "lmstudio",
+          savedModel.modelProvider as "deepseek" | "openai" | "ollama" | "lmstudio",
         );
         setModelId(savedModel.modelId);
       }
@@ -84,7 +84,9 @@ export function ModelPicker({
 
   // Get current model value
   const getCurrentModelValue = () => {
-    if (modelProvider === "ollama") {
+    if (modelProvider === "deepseek") {
+      return modelId ? `deepseek-${modelId}` : "deepseek";
+    } else if (modelProvider === "ollama") {
       return `ollama-${modelId}`;
     } else if (modelProvider === "lmstudio") {
       return `lmstudio-${modelId}`;
@@ -95,6 +97,13 @@ export function ModelPicker({
   // Get current model option for display
   const getCurrentModelOption = () => {
     const currentValue = getCurrentModelValue();
+
+    if (currentValue === "deepseek" || currentValue.startsWith("deepseek-")) {
+      return {
+        label: modelId && modelId.startsWith("deepseek-") ? modelId : "DeepSeek Chat",
+        icon: Bot,
+      };
+    }
 
     if (currentValue === "openai") {
       return {
@@ -132,7 +141,13 @@ export function ModelPicker({
   // Handle model change
   const handleModelChange = (value: string) => {
     console.log("Model changed to:", value);
-    if (value === "openai") {
+    if (value === "deepseek" || value.startsWith("deepseek-")) {
+      const model = value === "deepseek" ? "deepseek-chat" : value.replace("deepseek-", "");
+      setModelProvider("deepseek");
+      setModelId(model);
+      setSelectedModel("deepseek", model);
+      console.log("Saved to localStorage: deepseek,", model);
+    } else if (value === "openai") {
       setModelProvider("openai");
       setModelId("");
       setSelectedModel("openai", "");
@@ -193,16 +208,38 @@ export function ModelPicker({
             </SelectGroup>
           )}
 
-          {/* OpenAI Group */}
+          {/* Cloud Models Group */}
           <SelectGroup>
             <SelectLabel>Cloud Models</SelectLabel>
+            <SelectItem value="deepseek">
+              <div className="flex items-center gap-3">
+                <Bot className="h-4 w-4 flex-shrink-0" />
+                <div className="flex flex-col min-w-0">
+                  <span className="truncate text-sm">DeepSeek Chat</span>
+                  <span className="text-xs text-muted-foreground truncate">
+                    Advanced AI model with superior reasoning
+                  </span>
+                </div>
+              </div>
+            </SelectItem>
+            <SelectItem value="deepseek-reasoner">
+              <div className="flex items-center gap-3">
+                <Bot className="h-4 w-4 flex-shrink-0" />
+                <div className="flex flex-col min-w-0">
+                  <span className="truncate text-sm">DeepSeek Reasoner</span>
+                  <span className="text-xs text-muted-foreground truncate">
+                    Advanced reasoning model for complex tasks
+                  </span>
+                </div>
+              </div>
+            </SelectItem>
             <SelectItem value="openai">
               <div className="flex items-center gap-3">
                 <Bot className="h-4 w-4 flex-shrink-0" />
                 <div className="flex flex-col min-w-0">
                   <span className="truncate text-sm">GPT-4o-mini</span>
                   <span className="text-xs text-muted-foreground truncate">
-                    Cloud-based AI model
+                    Cloud-based AI model (fallback)
                   </span>
                 </div>
               </div>

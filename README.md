@@ -110,6 +110,9 @@ Before you begin, ensure you have the following installed:
 
    ```env
    # AI Providers
+   # Primary AI provider - DeepSeek API (required)
+   DEEPSEEK_API_KEY=""
+   # Optional fallback AI provider - OpenAI API
    OPENAI_API_KEY=""
    TOGETHER_AI_API_KEY=""
 

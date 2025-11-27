@@ -1,3 +1,22 @@
+<!-- OPENSPEC:START -->
+# OpenSpec Instructions
+
+These instructions are for AI assistants working in this project.
+
+Always open `@/openspec/AGENTS.md` when the request:
+- Mentions planning or proposals (words like proposal, spec, change, plan)
+- Introduces new capabilities, breaking changes, architecture shifts, or big performance/security work
+- Sounds ambiguous and you need the authoritative spec before coding
+
+Use `@/openspec/AGENTS.md` to learn:
+- How to create and apply change proposals
+- Spec format and conventions
+- Project structure and guidelines
+
+Keep this managed block so 'openspec update' can refresh the instructions.
+
+<!-- OPENSPEC:END -->
+
 # Presentation AI - AI驱动演示文稿生成系统
 
 ## 变更记录 (Changelog)
@@ -151,7 +170,8 @@ pnpm lint
 ### 环境变量配置
 参考 `.env.example` 文件，配置以下关键变量：
 - `DATABASE_URL`: PostgreSQL数据库连接
-- `OPENAI_API_KEY`: OpenAI API密钥
+- `DEEPSEEK_API_KEY`: DeepSeek API密钥 (主要AI服务提供商)
+- `OPENAI_API_KEY`: OpenAI API密钥 (可选fallback)
 - `TOGETHER_AI_API_KEY`: Together AI API密钥
 - `GOOGLE_CLIENT_ID/SECRET`: Google OAuth配置
 - `NEXTAUTH_SECRET`: NextAuth密钥
@@ -200,7 +220,8 @@ src/
 ## AI使用指引
 
 ### 支持的AI模型
-- **OpenAI**: GPT系列模型用于文本生成
+- **DeepSeek** (默认): DeepSeek Chat和DeepSeek Reasoner模型，提供高质量的文本生成和推理能力
+- **OpenAI** (备用): GPT系列模型作为fallback选项
 - **Together AI**: 图像生成模型
 - **本地模型**: 支持Ollama和LM Studio
 
@@ -211,17 +232,17 @@ src/
 4. **网络搜索集成**: 使用Tavily API获取最新信息
 
 ### 开发AI功能注意事项
-- 确保API密钥安全存储
-- 实现适当的错误处理和重试机制
-- 考虑模型响应时间和成本
-- 实现流式响应以提升用户体验
+- 确保API密钥安全存储 (DEEPSEEK_API_KEY为必需)
+- 实现适当的错误处理和重试机制 (已内置指数退避重试)
+- 考虑模型响应时间和成本 (DeepSeek成本更低，响应速度优异)
+- 实现流式响应以提升用户体验 (支持OpenAI兼容格式)
 
 ## 部署建议
 
 ### 生产环境
 - 推荐使用 Vercel 或 Railway
 - 配置 PostgreSQL 数据库
-- 设置环境变量
+- 设置环境变量 (必须包含 DEEPSEEK_API_KEY)
 - 配置域名和SSL
 
 ### Docker部署
