@@ -16,6 +16,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth, { type DefaultSession, type Session } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
 import GoogleProvider from "next-auth/providers/google";
+
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
@@ -34,50 +35,25 @@ declare module "next-auth" {
 }
 
 /**
- * 创建NextAuth适配器
- *
- * 使用完全稳健的方法创建适配器，确保在OAuth回调过程中也能正确访问数据库
+ * 创建NextAuth适配器（使用应用内的 NextAuth 专用 PrismaClient）
+ * - 避免硬编码 DATABASE_URL
+ * - 避免在 ESM 中使用 require()
+ * - 统一复用 src/server/db.ts 的 nextauth 连接
  */
 function createNextAuthAdapter(): Adapter {
-  console.log("🔐 开始创建超级稳健的NextAuth PrismaAdapter...");
+  console.log("🔐 创建 NextAuth PrismaAdapter（使用共享 nextauth 连接）...");
 
   try {
-    // 直接硬编码数据库URL，确保在运行时始终可用
-    const databaseUrl = "postgresql://postgres:123456@localhost:5432/presentation_ai";
+    const adapterClient = getNextAuthDb();
 
-    console.log("✅ 数据库URL已硬编码设置:", databaseUrl.replace(/\/\/.*@/, "//***@***"));
-
-    // 创建PrismaClient，使用绝对确保的方式传递数据库URL
-    const { PrismaClient } = require("@prisma/client");
-
-    // 验证数据库URL格式
-    try {
-      new URL(databaseUrl);
-    } catch (urlError) {
-      throw new Error(`DATABASE_URL格式无效: ${urlError.message}`);
-    }
-
-    const adapterClient = new PrismaClient({
-      datasources: {
-        db: {
-          url: databaseUrl,
-        },
-      },
-      log: process.env.NODE_ENV === "development" ? ["error", "warn", "query"] : ["error"],
-      // 添加额外的连接配置以确保稳定性
-      __internal: {
-        engine: {
-          connectTimeout: 10000,
-        },
-      },
-    });
-
-    console.log("✅ NextAuth专用PrismaClient创建成功");
+    console.log(
+      "✅ 使用 serverEnv.DATABASE_URL 创建适配器:",
+      serverEnv.DATABASE_URL.replace(/\/\/.*@/, "//***:***@")
+    );
 
     // 创建适配器
     const adapter = PrismaAdapter(adapterClient) as Adapter;
-
-    console.log("✅ NextAuth PrismaAdapter创建成功");
+    console.log("✅ NextAuth PrismaAdapter 创建成功");
 
     // 包装适配器以添加额外的错误处理和调试信息
     const wrappedAdapter = {
@@ -104,13 +80,13 @@ function createNextAuthAdapter(): Adapter {
         try {
           console.log("🔐 通过账户获取用户:", provider_providerAccountId);
           return await adapter.getUserByAccount!(provider_providerAccountId);
-        } catch (error) {
+        } catch (error: any) {
           console.error("❌ 通过账户获取用户失败:", error);
           console.error("💥 错误详情:", {
             provider: provider_providerAccountId.provider,
             providerAccountId: provider_providerAccountId.providerAccountId,
-            databaseUrl: databaseUrl.replace(/\/\/.*@/, "//***@***"),
-            errorMessage: error.message,
+            databaseUrl: serverEnv.DATABASE_URL.replace(/\/\/.*@/, "//***:***@"),
+            errorMessage: error?.message,
           });
           throw error;
         }
@@ -127,7 +103,7 @@ function createNextAuthAdapter(): Adapter {
     };
 
     return wrappedAdapter;
-  } catch (error) {
+  } catch (error: any) {
     console.error("❌ NextAuth适配器创建失败:", error);
 
     // 提供详细的错误诊断
@@ -139,7 +115,7 @@ function createNextAuthAdapter(): Adapter {
       });
     }
 
-    throw new Error(`NextAuth适配器创建失败: ${error.message}`);
+    throw new Error(`NextAuth适配器创建失败: ${error?.message}`);
   }
 }
 

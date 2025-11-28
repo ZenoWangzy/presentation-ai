@@ -9,9 +9,12 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 从cookie中获取NextAuth会话token
-  const sessionToken = request.cookies.get("next-auth.session-token") ||
-                      request.cookies.get("__Secure-next-auth.session-token");
+  // 从cookie中获取会话token（兼容 next-auth v4 与 auth.js v5）
+  const sessionCookie =
+    request.cookies.get("authjs.session-token") ||
+    request.cookies.get("__Secure-authjs.session-token") ||
+    request.cookies.get("next-auth.session-token") ||
+    request.cookies.get("__Secure-next-auth.session-token");
 
   const isAuthPage = pathname.startsWith("/auth");
   const isApiRoute = pathname.startsWith("/api");
@@ -22,12 +25,12 @@ export async function middleware(request: NextRequest) {
   }
 
   // 如果用户已登录（有session token）但在认证页面，重定向到主页
-  if (isAuthPage && sessionToken) {
+  if (isAuthPage && sessionCookie) {
     return NextResponse.redirect(new URL("/presentation", request.url));
   }
 
   // 如果用户未登录且尝试访问受保护的路由，重定向到登录页面
-  if (!sessionToken && !isAuthPage && !isApiRoute) {
+  if (!sessionCookie && !isAuthPage && !isApiRoute) {
     const loginUrl = new URL("/auth/signin", request.url);
     loginUrl.searchParams.set("callbackUrl", encodeURIComponent(request.url));
     return NextResponse.redirect(loginUrl);
