@@ -58,12 +58,12 @@ pnpm postinstall
 ## Core Architecture
 
 ### Presentation Generation Workflow
-1. **User Input** ¡ú Dashboard form with topic, slides count, language, style preferences
-2. **Outline Generation** ¡ú AI creates structured outline (with optional web search)
-3. **Theme Selection** ¡ú User chooses from 9 built-in themes or creates custom theme
-4. **Content Generation** ¡ú AI generates slides with text, images, and layout
-5. **Real-time Editing** ¡ú Plate Editor for rich text editing and customization
-6. **Export/Present** ¡ú Present mode or export to PowerPoint
+1. **User Input** ï¿½ï¿½ Dashboard form with topic, slides count, language, style preferences
+2. **Outline Generation** ï¿½ï¿½ AI creates structured outline (with optional web search)
+3. **Theme Selection** ï¿½ï¿½ User chooses from 9 built-in themes or creates custom theme
+4. **Content Generation** ï¿½ï¿½ AI generates slides with text, images, and layout
+5. **Real-time Editing** ï¿½ï¿½ Plate Editor for rich text editing and customization
+6. **Export/Present** ï¿½ï¿½ Present mode or export to PowerPoint
 
 ### State Management Architecture
 - **Central State**: `src/states/presentation-state.ts` using Zustand

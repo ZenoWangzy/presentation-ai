@@ -19,7 +19,8 @@ Presentation AI 是一个基于AI的演示文稿生成平台，灵感来源于Ga
 - **NextAuth.js**: 5.0.0-beta.29 (Google OAuth)
 
 ### AI集成
-- **OpenAI API**: GPT系列模型，文本生成
+- **DeepSeek**: (默认) Chat和Reasoner模型，提供高质量文本生成
+- **OpenAI API**: (备用) GPT系列模型
 - **Together AI**: 图像生成
 - **本地模型**: Ollama + LM Studio支持
 
@@ -27,6 +28,22 @@ Presentation AI 是一个基于AI的演示文稿生成平台，灵感来源于Ga
 - **Plate.js**: 49.2.21 (基于Slate/ProseMirror的富文本编辑器)
 - **DND Kit**: 拖拽功能
 - **Radix UI**: 无障碍UI组件
+- **Lucide React**: 图标库
+- **Framer Motion**: 11.18.2 动画库
+- **Recharts**: 2.15.4 图表库
+
+### 状态管理与数据获取
+- **Zustand**: 4.5.7 轻量级状态管理
+- **TanStack Query (React Query)**: 5.84.2 服务端状态管理与数据获取
+
+### 表单与验证
+- **React Hook Form**: 表单处理
+- **Zod**: 模式声明与验证
+
+### 工具链
+- **LangChain**: 0.3.30 AI开发框架
+- **Tavily API**: 0.5.12 网络搜索
+- **pptxgenjs**: 4.0.1 PPT导出
 
 ### 文件处理
 - **UploadThing**: 文件上传服务
@@ -89,6 +106,31 @@ src/
 - **Outline**: 大纲，演示文稿的结构化内容
 - **AI Generation**: AI驱动的内容生成过程
 
+### 核心数据流
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant D as Dashboard
+    participant API as API Routes
+    participant AI as AI Service
+    participant DB as Database
+
+    U->>D: 输入演示文稿主题
+    D->>API: 请求生成大纲
+    API->>AI: 调用AI模型
+    AI-->>API: 返回大纲内容
+    API-->>D: 返回大纲
+    D->>U: 显示大纲供编辑
+
+    U->>D: 确认生成演示文稿
+    D->>API: 请求生成演示文稿
+    API->>AI: 调用AI生成幻灯片
+    AI-->>API: 返回幻灯片内容
+    API->>DB: 保存演示文稿
+    API-->>D: 返回演示文稿
+    D->>U: 显示编辑界面
+```
+
 ### 用户角色
 - **User**: 普通用户，可创建和编辑演示文稿
 - **Admin**: 管理员，具有系统管理权限
@@ -113,6 +155,16 @@ src/
 - 限制API调用频率
 - 安全的文件上传处理
 
+### 环境变量配置
+- `DATABASE_URL`: PostgreSQL数据库连接
+- `DEEPSEEK_API_KEY`: DeepSeek API密钥 (主要AI服务提供商)
+- `OPENAI_API_KEY`: OpenAI API密钥 (可选fallback)
+- `TOGETHER_AI_API_KEY`: Together AI API密钥
+- `GOOGLE_CLIENT_ID/SECRET`: Google OAuth配置
+- `NEXTAUTH_SECRET`: NextAuth密钥
+- `UNSPLASH_ACCESS_KEY`: Unsplash图片API密钥
+- `TAVILY_API_KEY`: Tavily网络搜索API密钥
+
 ## External Dependencies
 
 ### AI服务
@@ -136,3 +188,13 @@ src/
 - **Vercel**: 推荐的部署平台
 - **Railway**: 数据库托管
 - **GitHub**: 代码托管和CI/CD
+
+## Roadmap
+- [x] 导出PPTX功能 (已实现pptxgenjs集成)
+- [ ] 导出PDF功能
+- [ ] 实时协作
+- [ ] 模板库
+- [ ] 动画和过渡效果
+- [ ] 多语言支持
+- [ ] 插件系统
+- [ ] API开放平台
