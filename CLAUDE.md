@@ -21,6 +21,12 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 
 ## 变更记录 (Changelog)
 
+**2025-11-28** - 全面文档更新，补充缺失模块和技术栈
+- 补充 provider、states、styles、prose-mirror 模块文档
+- 更新完整技术栈：状态管理、动画库、图表库、AI工具链
+- 补充数据模型：CustomTheme、FavoriteDocument、GeneratedImage
+- 更新依赖版本：React 19.1.0、Next.js 15.5.4、pnpm 10.17.0
+
 **2025-11-17 23:56:24** - 初始化架构扫描，完成75%覆盖率分析
 - 识别8个核心模块
 - 发现完整的演示文稿生成流程
@@ -33,13 +39,19 @@ Presentation AI 是一个基于AI的演示文稿生成平台，灵感来源于Ga
 ## 架构总览
 
 ### 技术栈
+- **包管理器**: pnpm 10.17.0
 - **前端**: Next.js 15.5.4 + React 19.1.0 + TypeScript + Tailwind CSS
 - **后端**: Next.js API Routes + Prisma ORM + PostgreSQL
-- **认证**: NextAuth.js (Google OAuth)
-- **编辑器**: Plate.js (基于Slate/ProseMirror)
-- **AI集成**: OpenAI API + Together AI + 本地模型支持(Ollama/LM Studio)
-- **UI组件**: Radix UI + Lucide React + Framer Motion
+- **认证**: NextAuth.js 5.0.0-beta.29 (Google OAuth)
+- **状态管理**: Zustand 4.5.7 + TanStack Query 5.84.2
+- **编辑器**: Plate.js 49.x (富文本) + ProseMirror (大纲编辑)
+- **AI工具链**: LangChain 0.3.30 + DeepSeek/OpenAI + Together AI
+- **动画**: Framer Motion 11.18.2
+- **图表**: Recharts 2.15.4
+- **网络搜索**: Tavily API 0.5.12
+- **UI组件**: Radix UI + Lucide React
 - **文件处理**: UploadThing
+- **导出**: pptxgenjs 4.0.1
 
 ### 核心功能
 - AI驱动的内容生成和演示文稿创建
@@ -48,7 +60,11 @@ Presentation AI 是一个基于AI的演示文稿生成平台，灵感来源于Ga
 - 多种布局元素和图表支持
 - 图像生成和集成
 - 演示模式
-- 导出功能(PPTX开发中)
+- 收藏功能 - 用户可收藏演示文稿
+- 图像生成历史 - 记录所有AI生成的图像
+- 自定义主题管理 - 创建、保存和分享自定义主题
+- 网络搜索增强 - 使用Tavily API获取实时信息
+- 导出功能(PPTX支持)
 
 ## 模块结构图
 
@@ -58,8 +74,11 @@ graph TD
     A --> C["src/components"];
     A --> D["src/hooks"];
     A --> E["src/lib"];
-    A --> F["src/server"];
-    A --> G["prisma"];
+    A --> F["src/provider"];
+    A --> G["src/states"];
+    A --> H["src/styles"];
+    A --> I["src/server"];
+    A --> J["prisma"];
 
     B --> B1["API Routes"];
     B --> B2["Pages"];
@@ -67,9 +86,10 @@ graph TD
 
     C --> C1["presentation"];
     C --> C2["plate"];
-    C --> C3["auth"];
-    C --> C4["ui"];
-    C5["globals"];
+    C --> C3["prose-mirror"];
+    C --> C4["auth"];
+    C --> C5["ui"];
+    C6["globals"];
 
     C1 --> C1A["dashboard"];
     C1 --> C1B["editor"];
@@ -80,6 +100,19 @@ graph TD
     C2 --> C2B["hooks"];
     C2 --> C2C["ui"];
 
+    C3 --> C3A["ProseMirrorEditor"];
+    C3 --> C3B["FloatingToolbar"];
+    C3 --> C3C["ProseMirrorSchema"];
+
+    F --> F1["NextAuthProvider"];
+    F --> F2["TanstackProvider"];
+    F --> F3["theme-provider"];
+
+    G --> G1["presentation-state"];
+
+    H --> H1["globals.css"];
+    H --> H2["presentation.css"];
+
     D --> D1["presentation"];
     D --> D2["globals"];
 
@@ -87,17 +120,20 @@ graph TD
     E --> E2["model-picker"];
     E --> E3["utils"];
 
-    F --> F1["auth"];
-    F --> F2["db"];
+    I --> I1["auth"];
+    I --> I2["db"];
 
-    G --> G1["schema.prisma"];
+    J --> J1["schema.prisma"];
 
     click B "./src/app/CLAUDE.md" "查看应用模块文档"
     click C "./src/components/CLAUDE.md" "查看组件模块文档"
     click D "./src/hooks/CLAUDE.md" "查看钩子模块文档"
     click E "./src/lib/CLAUDE.md" "查看工具库文档"
-    click F "./src/server/CLAUDE.md" "查看服务端文档"
-    click G "./prisma/CLAUDE.md" "查看数据库文档"
+    click F "./src/provider/CLAUDE.md" "查看Provider模块文档"
+    click G "./src/states/CLAUDE.md" "查看状态管理文档"
+    click H "./src/styles/CLAUDE.md" "查看样式模块文档"
+    click I "./src/server/CLAUDE.md" "查看服务端文档"
+    click J "./prisma/CLAUDE.md" "查看数据库文档"
 ```
 
 ## 模块索引
@@ -107,6 +143,10 @@ graph TD
 | `src/app` | Next.js App Router | 应用路由、API端点、服务端操作 | 高 |
 | `src/components/presentation` | React组件 | 演示文稿UI组件，包含仪表板和编辑器 | 高 |
 | `src/components/plate` | 编辑器组件 | Plate.js富文本编辑器配置和插件 | 中 |
+| `src/components/prose-mirror` | 编辑器组件 | ProseMirror大纲编辑器 | 中 |
+| `src/provider` | React Context | 应用级Provider（认证、查询、主题） | 中 |
+| `src/states` | 状态管理 | Zustand全局状态管理 | 低 |
+| `src/styles` | 样式文件 | 全局样式和CSS模块 | 低 |
 | `src/app/_actions` | Server Actions | 服务端操作函数，处理CRUD操作 | 中 |
 | `src/hooks` | React Hooks | 自定义钩子，状态管理和副作用 | 中 |
 | `src/lib` | 工具库 | 共享工具函数、配置和业务逻辑 | 低 |
@@ -175,6 +215,8 @@ pnpm lint
 - `TOGETHER_AI_API_KEY`: Together AI API密钥
 - `GOOGLE_CLIENT_ID/SECRET`: Google OAuth配置
 - `NEXTAUTH_SECRET`: NextAuth密钥
+- `UNSPLASH_ACCESS_KEY`: Unsplash图片API密钥
+- `TAVILY_API_KEY`: Tavily网络搜索API密钥
 
 ## 测试策略
 
@@ -210,8 +252,18 @@ src/
 │   └── (pages)/        # 页面组件
 ├── components/         # React组件
 │   ├── presentation/   # 演示文稿相关组件
-│   ├── plate/         # 编辑器组件
+│   ├── plate/         # Plate.js编辑器组件
+│   ├── prose-mirror/  # ProseMirror大纲编辑器
 │   └── ui/            # 通用UI组件
+├── provider/           # React Context Providers
+│   ├── NextAuthProvider.tsx
+│   ├── TanstackProvider.tsx
+│   └── theme-provider.tsx
+├── states/             # Zustand状态管理
+│   └── presentation-state.ts
+├── styles/             # 全局样式
+│   ├── globals.css
+│   └── presentation.css
 ├── hooks/             # 自定义React钩子
 ├── lib/               # 工具函数和配置
 └── server/            # 服务端配置
@@ -230,6 +282,7 @@ src/
 2. **幻灯片内容生成**: 根据大纲生成详细幻灯片内容
 3. **图像生成**: 为幻灯片生成相关图像
 4. **网络搜索集成**: 使用Tavily API获取最新信息
+5. **思考过程提取**: 配合DeepSeek Reasoner等推理模型提取思考过程
 
 ### 开发AI功能注意事项
 - 确保API密钥安全存储 (DEEPSEEK_API_KEY为必需)
@@ -285,6 +338,7 @@ src/
 
 ## 扩展功能路线图
 
+- [x] 导出PPTX功能 (已实现pptxgenjs集成)
 - [ ] 导出PDF功能
 - [ ] 实时协作
 - [ ] 模板库
@@ -292,3 +346,11 @@ src/
 - [ ] 多语言支持
 - [ ] 插件系统
 - [ ] API开放平台
+
+---
+
+## 文档生成时间
+
+**最后更新**: 2025-11-28
+**扫描覆盖率**: ~90% (主要源代码目录)
+**验证状态**: ✅ 已验证项目结构和依赖关系
