@@ -37,3 +37,7 @@ next-env.d.ts
 
 # OAuth client secrets
 client_secret_*.json
+
+# temporary files
+debug.md
+nul
