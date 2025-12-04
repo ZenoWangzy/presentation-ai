@@ -41,3 +41,18 @@ client_secret_*.json
 # temporary files
 debug.md
 nul
+
+# 测试环境敏感文件 - 完全排除
+.env.test
+.env.test.local
+.env.local.test
+
+# 测试临时文件
+test-results/
+playwright-report/
+coverage/
+.nyc_output/
+
+# 调试文件
+Current.md
+*.tmp
