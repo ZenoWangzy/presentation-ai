@@ -1,0 +1,237 @@
+/**
+ * 图片生成Action集成测试
+ * 测试generateImageAction的完整流程：AI生成 → 下载 → Upload → DB持久化
+ */
+
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+
+// Mock server-only (必须在所有imports之前)
+vi.mock('server-only', () => ({}));
+
+import { generateImageAction } from '@/app/_actions/image/generate';
+import { db } from '@/server/db';
+import { auth } from '@/server/auth';
+
+// Mock auth
+vi.mock('@/server/auth');
+
+// Mock Together AI client
+vi.mock('together-ai', () => ({
+    default: vi.fn().mockImplementation(() => ({
+        images: {
+            create: vi.fn().mockResolvedValue({
+                id: 'mock-image-id',
+                model: 'flux-schnell',
+                object: 'image',
+                data: [{
+                    url: 'https://api.together.xyz/mock-generated-image.png',
+                }],
+            }),
+        },
+    })),
+}));
+
+// Mock UploadThing API
+vi.mock('@/app/api/uploadthing/core', () => ({
+    utapi: {
+        uploadFiles: vi.fn().mockResolvedValue([
+            {
+                data: {
+                    ufsUrl: 'https://utfs.io/f/mock-uploaded-image.png',
+                    key: 'mock-key-123',
+                    name: 'test-image.png',
+                    size: 1024,
+                },
+                error: null,
+            },
+        ]),
+    },
+}));
+
+// Mock fetch for image download
+global.fetch = vi.fn().mockImplementation((url: string) => {
+    if (url.includes('mock-generated-image.png')) {
+        return Promise.resolve({
+            ok: true,
+            blob: () => Promise.resolve(new Blob(['mock-image-data'], { type: 'image/png' })),
+        } as Response);
+    }
+    return Promise.reject(new Error('Unknown URL'));
+});
+
+describe('Image Generation Action Integration Tests', () => {
+    beforeEach(() => {
+        // Mock authenticated session
+        vi.mocked(auth).mockResolvedValue({
+            user: {
+                id: 'test-user-123',
+                email: 'test@example.com',
+                name: 'Test User',
+            },
+            expires: new Date(Date.now() + 86400000).toISOString(),
+        } as any);
+
+        // Clear all mocks
+        vi.clearAllMocks();
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    describe('完整流程测试', () => {
+        it('should complete full AI → Upload → DB flow', async () => {
+            const result = await generateImageAction('AI concept diagram');
+
+            expect(result.success).toBe(true);
+            expect(result.image).toBeDefined();
+            expect(result.image?.url).toBe('https://utfs.io/f/mock-uploaded-image.png');
+            expect(result.image?.prompt).toBe('AI concept diagram');
+            expect(result.image?.userId).toBe('test-user-123');
+        });
+
+        it('should use correct model for schnell variant', async () => {
+            const Together = (await import('together-ai')).default;
+            const mockCreate = vi.mocked(Together).mock.results[0]?.value.images.create;
+
+            await generateImageAction('test prompt', 'black-forest-labs/FLUX.1-schnell-Free');
+
+            expect(mockCreate).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    model: 'black-forest-labs/FLUX.1-schnell-Free',
+                    prompt: 'test prompt',
+                    steps: 4, // schnell使用较少的步骤
+                })
+            );
+        });
+
+        it('should use correct steps for non-schnell models', async () => {
+            const Together = (await import('together-ai')).default;
+            const mockCreate = vi.mocked(Together).mock.results[0]?.value.images.create;
+
+            await generateImageAction('test prompt', 'black-forest-labs/FLUX.1-pro');
+
+            expect(mockCreate).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    model: 'black-forest-labs/FLUX.1-pro',
+                    steps: 28, // 非schnell使用更多步骤
+                })
+            );
+        });
+    });
+
+    describe('失败路径测试', () => {
+        it('should handle Together AI failure gracefully', async () => {
+            const Together = (await import('together-ai')).default;
+            const mockTogether = vi.mocked(Together).mock.results[0]?.value;
+
+            mockTogether.images.create.mockRejectedValueOnce(new Error('AI API Error'));
+
+            const result = await generateImageAction('test prompt');
+
+            expect(result.success).toBe(false);
+            expect(result.error).toContain('AI API Error');
+        });
+
+        it('should handle missing image URL from Together AI', async () => {
+            const Together = (await import('together-ai')).default;
+            const mockTogether = vi.mocked(Together).mock.results[0]?.value;
+
+            mockTogether.images.create.mockResolvedValueOnce({
+                id: 'mock-id',
+                data: [{ url: undefined }],
+            } as any);
+
+            const result = await generateImageAction('test prompt');
+
+            expect(result.success).toBe(false);
+            expect(result.error).toContain('Failed to generate image');
+        });
+
+        it('should handle image download failure', async () => {
+            global.fetch = vi.fn().mockResolvedValueOnce({
+                ok: false,
+                statusText: 'Not Found',
+            } as Response);
+
+            const result = await generateImageAction('test prompt');
+
+            expect(result.success).toBe(false);
+            expect(result.error).toBeDefined();
+        });
+
+        it('should handle upload failure gracefully', async () => {
+            const { utapi } = await import('@/app/api/uploadthing/core');
+
+            vi.mocked(utapi.uploadFiles).mockResolvedValueOnce([
+                {
+                    data: null,
+                    error: { message: 'Upload failed', code: 'UPLOAD_ERROR' },
+                },
+            ] as any);
+
+            const result = await generateImageAction('test prompt');
+
+            expect(result.success).toBe(false);
+            expect(result.error).toContain('Failed to upload image');
+        });
+    });
+
+    describe('认证测试', () => {
+        it('should require authentication', async () => {
+            vi.mocked(auth).mockResolvedValueOnce(null);
+
+            await expect(generateImageAction('test prompt')).rejects.toThrow(
+                'You must be logged in to generate images'
+            );
+        });
+
+        it('should require user ID in session', async () => {
+            vi.mocked(auth).mockResolvedValueOnce({
+                user: null,
+                expires: new Date().toISOString(),
+            } as any);
+
+            await expect(generateImageAction('test prompt')).rejects.toThrow(
+                'You must be logged in to generate images'
+            );
+        });
+    });
+
+    describe('数据持久化测试', () => {
+        it('should save image metadata to database', async () => {
+            const result = await generateImageAction('AI training diagram');
+
+            expect(result.success).toBe(true);
+
+            // 验证传入db.generatedImage.create的数据
+            // 注意：这里我们在mock环境中，实际不会真的写入数据库
+            // 在真实集成测试中，应该查询数据库验证数据已保存
+            expect(result.image?.url).toBe('https://utfs.io/f/mock-uploaded-image.png');
+            expect(result.image?.prompt).toBe('AI training diagram');
+        });
+
+        it('should associate image with correct user', async () => {
+            const result = await generateImageAction('test image');
+
+            expect(result.success).toBe(true);
+            expect(result.image?.userId).toBe('test-user-123');
+        });
+    });
+
+    describe('单次图片生成成本控制', () => {
+        it('should generate exactly one image per call', async () => {
+            const Together = (await import('together-ai')).default;
+            const mockCreate = vi.mocked(Together).mock.results[0]?.value.images.create;
+
+            await generateImageAction('test prompt');
+
+            expect(mockCreate).toHaveBeenCalledTimes(1);
+            expect(mockCreate).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    n: 1, // 仅生成1张图片
+                })
+            );
+        });
+    });
+});
